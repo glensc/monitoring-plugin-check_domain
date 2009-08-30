@@ -1,12 +1,11 @@
 %define		plugin	check_domain
 Summary:	Nagios pluging for checking a domain name expiration date
 Name:		nagios-plugin-%{plugin}
-Version:	0.1
-Release:	0.1
+Version:	1.2
+Release:	1
 License:	BSD
 Group:		Networking
 Source0:	%{plugin}
-# Source0-md5:	fe2dffc066980e2385d88755703f97fe
 URL:		http://www.tomas.cat/blog/en/checking-domain-name-expiration-date-checkdomain
 Requires:	whois
 BuildArch:	noarch
@@ -24,7 +23,7 @@ install -p %{SOURCE0} %{plugin}
 
 cat > nagios.cfg <<'EOF'
 # Usage:
-# %{plugin}
+# %{plugin}!DOMAINNAME
 define command {
 	command_name    %{plugin}
 	command_line    %{plugindir}/%{plugin} -w 30 -c 10 -d $ARG1$
