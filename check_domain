@@ -70,26 +70,28 @@ else
 fi
 
 # Calculate days until expiration
-country=$(awk -vd="$domain" 'BEGIN{print substr(d, length(d) - 2); exit}')
-
-if [ "$country" = ".ru" ]; then
+case "$domain" in
+*.ru)
 	expiration=$(whois $domain | awk '/paid-till:/{split($2, a, "."); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
-else
-	expiration=$(whois $domain | awk '/Expiration Date:/{print $3}')
-fi
+	;;
+*)
+	expiration=$(whois $domain |awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
+	;;
+esac
 
 [ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Domain doesn't exist or no WHOIS server available."
 
 expseconds=$(date +%s --date="$expiration")
+expdate=$(date +'%Y-%m-%d' --date="$expiration")
 nowseconds=$(date +%s)
 diffseconds=$((expseconds-nowseconds))
 expdays=$((diffseconds/86400))
 
 # Trigger alarms if applicable
 [ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain expired on $expiration"
-[ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain will expire in $expdays days"
-[ $expdays -lt $warning ]&& die $STATE_WARNING "WARNING - Domain will expire in $expdays days"
+[ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain will expire in $expdays days ($expdate)."
+[ $expdays -lt $warning ]&& die $STATE_WARNING "WARNING - Domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
-echo "OK - Domain will expire in $expdays days"
+echo "OK - Domain will expire in $expdays days ($expdate)."
 exit $STATE_OK
