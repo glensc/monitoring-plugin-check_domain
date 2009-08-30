@@ -57,7 +57,20 @@ else
 fi
 
 # Calculate days until expiration
-expiration=`whois $domain |grep "Expiration Date:"| awk -F"Date:" '{print $2}'|cut -f 1`
+country=${domain: -3}
+
+if [ "$country" = ".ru" ]
+	then
+	ruexpiration=`whois $domain |grep "paid-till:"| awk -F"paid-till:" '{print $2}'|cut -f 1`
+		year=${ruexpiration: 2:4}
+		month=${ruexpiration: 7:2}
+		day=${ruexpiration: -2}
+		month_string=`date +%b -d"$year$month$day"`
+		expiration="$day-$month_string-$year"
+	else
+		expiration=`whois $domain |grep "Expiration Date:"| awk -F"Date:" '{print $2}'|cut -f 1`
+	fi
+
 expseconds=`date +%s --date="$expiration"`
 nowseconds=`date +%s`
 ((diffseconds=expseconds-nowseconds))
