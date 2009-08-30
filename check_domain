@@ -1,4 +1,5 @@
 #!/bin/sh
+PROGRAM=${0##*/}
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
@@ -7,10 +8,10 @@ critical=7
 warning=30
 
 # Parse arguments
-args=$(getopt -o hd:w:c:P: --long help,domain:,warning:,critical:,path: -u -n $0 -- "$@")
+args=$(getopt -o hd:w:c:P: --long help,domain:,warning:,critical:,path: -u -n $PROGRAM -- "$@")
 if [ $? != 0 ]; then
-	echo "$0: Could not parse arguments"
-	echo "Usage: $0 -h | -d <domain> [-c <critical>] [-w <warning>]"
+	echo "$PROGRAM: Could not parse arguments"
+	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
 	exit 1
 fi
 set -- $args
@@ -34,7 +35,7 @@ while :; do
 					   echo ""
 					   echo "This plugin checks the expiration date of a domain name."
 					   echo ""
-					   echo "Usage: $0 -h | -d <domain> [-c <critical>] [-w <warning>]"
+					   echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
 					   echo "NOTE: -d must be specified"
 					   echo ""
 					   echo "Options:"
@@ -49,7 +50,7 @@ while :; do
 					   echo ""
 					   echo "This plugin will use whois service to get the expiration date for the domain name. "
 					   echo "Example:"
-					   echo "     $0 -d domain.tld -w 30 -c 10"
+					   echo "     $PROGRAM -d domain.tld -w 30 -c 10"
 					   echo ""
 					   exit;;
 		--) shift; break;;
@@ -63,8 +64,7 @@ fi
 
 # Looking for whois binary
 if [ -z $whoispath ]; then
-	type whois > /dev/null 2>&1 || error="yes"
-	[ -z "$error" ] || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
+	type whois > /dev/null 2>&1 || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
 else
 	[ -x "$whoispath/whois" ] || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
 fi
@@ -78,13 +78,14 @@ else
 	expiration=$(whois $domain | awk '/Expiration Date:/{print $3}')
 fi
 
+[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Domain doesn't exist or no WHOIS server available."
+
 expseconds=$(date +%s --date="$expiration")
 nowseconds=$(date +%s)
 diffseconds=$((expseconds-nowseconds))
 expdays=$((diffseconds/86400))
 
 # Trigger alarms if applicable
-[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Domain doesn't exist or no WHOIS server available."
 [ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain expired on $expiration"
 [ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain will expire in $expdays days"
 [ $expdays -lt $warning ]&& die $STATE_WARNING "WARNING - Domain will expire in $expdays days"
