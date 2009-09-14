@@ -2,11 +2,12 @@
 Summary:	Nagios pluging for checking a domain name expiration date
 Name:		nagios-plugin-%{plugin}
 Version:	1.2
-Release:	2
+Release:	3
 License:	GPL
 Group:		Networking
 Source0:	%{plugin}
 URL:		http://www.tomas.cat/blog/en/checking-domain-name-expiration-date-checkdomain
+Source1:	%{plugin}.cfg
 Requires:	whois
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -21,20 +22,11 @@ Nagios pluging for checking a domain name expiration date.
 %setup -qcT
 install -p %{SOURCE0} %{plugin}
 
-cat > nagios.cfg <<'EOF'
-# Usage:
-# %{plugin}!DOMAINNAME
-define command {
-	command_name    %{plugin}
-	command_line    %{plugindir}/%{plugin} -w 30 -c 10 -d $ARG1$
-}
-EOF
-
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{plugindir}}
 install -p %{plugin} $RPM_BUILD_ROOT%{plugindir}/%{plugin}
-cp -a nagios.cfg $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}.cfg
+sed -e 's,@plugindir@,%{plugindir},' %{SOURCE1} > $RPM_BUILD_ROOT%{_sysconfdir}/%{plugin}.cfg
 
 %clean
 rm -rf $RPM_BUILD_ROOT
