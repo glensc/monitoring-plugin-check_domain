@@ -74,6 +74,9 @@ case "$domain" in
 *.ru)
 	expiration=$(whois $domain | awk '/paid-till:/{split($2, a, "."); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
 	;;
+*.ee)
+	expiration=$(whois $domain | awk '/expire:/{split($2, a, "."); printf("%s-%s-%s\n", a[3], a[2], a[1])}')
+	;;
 *)
 	expiration=$(whois $domain |awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;

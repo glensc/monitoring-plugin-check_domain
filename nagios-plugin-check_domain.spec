@@ -2,12 +2,12 @@
 Summary:	Nagios pluging for checking a domain name expiration date
 Name:		nagios-plugin-%{plugin}
 Version:	1.2
-Release:	3
+Release:	4
 License:	GPL
 Group:		Networking
 Source0:	%{plugin}
-URL:		http://www.tomas.cat/blog/en/checking-domain-name-expiration-date-checkdomain
 Source1:	%{plugin}.cfg
+URL:		http://www.tomas.cat/blog/en/checking-domain-name-expiration-date-checkdomain
 Requires:	whois
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
