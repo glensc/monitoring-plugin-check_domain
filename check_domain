@@ -10,7 +10,7 @@ warning=30
 # Parse arguments
 args=$(getopt -o hd:w:c:P: --long help,domain:,warning:,critical:,path: -u -n $PROGRAM -- "$@")
 if [ $? != 0 ]; then
-	echo "$PROGRAM: Could not parse arguments"
+	echo >&2 "$PROGRAM: Could not parse arguments"
 	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
 	exit 1
 fi
@@ -23,36 +23,41 @@ die() {
 	exit $rc
 }
 
+fullusage() {
+	cat <<EOF
+check_domain - v1.2
+Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2010 Elan Ruusamäe <glen@delfi.ee>
+under GPL License
+
+This plugin checks the expiration date of a domain name.
+
+Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]
+NOTE: -d must be specified
+
+Options:
+-h
+     Print detailed help
+-d
+     Domain name to check
+-w
+     Response time to result in warning status (days)
+-c
+     Response time to result in critical status (days)
+
+This plugin will use whois service to get the expiration date for the domain name.
+Example:
+     $PROGRAM -d domain.tld -w 30 -c 10
+
+EOF
+}
+
 while :; do
 	case "$1" in
 		-c|--critical) critical=$2; shift 2;;
 		-w|--warning)  warning=$2; shift 2;;
 		-d|--domain)   domain=$2; shift 2;;
 		-P|--path)     whoispath=$2; shift 2;;
-		-h|--help)     echo "check_domain - v1.2"
-					   echo "Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009 Elan Ruusamäe <glen@delfi.ee>"
-					   echo "under GPL License"
-					   echo ""
-					   echo "This plugin checks the expiration date of a domain name."
-					   echo ""
-					   echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
-					   echo "NOTE: -d must be specified"
-					   echo ""
-					   echo "Options:"
-					   echo "-h"
-					   echo "     Print detailed help"
-					   echo "-d"
-					   echo "     Domain name to check"
-					   echo "-w"
-					   echo "     Response time to result in warning status (days)"
-					   echo "-c"
-					   echo "     Response time to result in critical status (days)"
-					   echo ""
-					   echo "This plugin will use whois service to get the expiration date for the domain name. "
-					   echo "Example:"
-					   echo "     $PROGRAM -d domain.tld -w 30 -c 10"
-					   echo ""
-					   exit;;
+		-h|--help)     fullusage; exit;;
 		--) shift; break;;
 		*)  die $STATE_UNKNOWN "Internal error!";;
 	esac
