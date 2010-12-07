@@ -70,20 +70,24 @@ fi
 # Looking for whois binary
 if [ -z $whoispath ]; then
 	type whois > /dev/null 2>&1 || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
+	whois=whois
 else
 	[ -x "$whoispath/whois" ] || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
+	whois="$whoispath/whois"
 fi
+
+out=$($whois $domain)
 
 # Calculate days until expiration
 case "$domain" in
 *.ru)
-	expiration=$(whois $domain | awk '/paid-till:/{split($2, a, "."); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
+	expiration=$(echo "$out" | awk '/paid-till:/{split($2, a, "."); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
 	;;
 *.ee)
-	expiration=$(whois $domain | awk '/expire:/{split($2, a, "."); printf("%s-%s-%s\n", a[3], a[2], a[1])}')
+	expiration=$(echo "$out" | awk '/expire:/{split($2, a, "."); printf("%s-%s-%s\n", a[3], a[2], a[1])}')
 	;;
 *)
-	expiration=$(whois $domain |awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
+	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
 esac
 
