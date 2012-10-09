@@ -25,8 +25,8 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2
-Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2010 Elan Ruusamäe <glen@delfi.ee>
+check_domain - v1.2.1
+Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2012 Elan Ruusamäe <glen@delfi.ee>
 under GPL License
 
 This plugin checks the expiration date of a domain name.
@@ -85,6 +85,9 @@ case "$domain" in
 	;;
 *.ee)
 	expiration=$(echo "$out" | awk '/expire:/{split($2, a, "."); printf("%s-%s-%s\n", a[3], a[2], a[1])}')
+	;;
+*.tv)
+	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 3, 10)}')
 	;;
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
