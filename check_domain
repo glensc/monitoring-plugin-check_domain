@@ -18,15 +18,15 @@ set -- $args
 
 die() {
 	local rc=$1
-	local msg=$2
-	echo $msg
+	local msg="$2"
+	echo "$msg"
 	exit $rc
 }
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.1
-Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2012 Elan Ruusamäe <glen@delfi.ee>
+check_domain - v1.2.2
+Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
 under GPL License
 
 This plugin checks the expiration date of a domain name.
