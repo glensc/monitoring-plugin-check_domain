@@ -97,6 +97,10 @@ case "$domain" in
 *.tv)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 3, 10)}')
 	;;
+*.ca)
+	# Expiry date: 2017/07/16
+	expiration=$(echo "$out" | awk '/Expiry date:/{split($3, a, "/"); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
+	;;
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
