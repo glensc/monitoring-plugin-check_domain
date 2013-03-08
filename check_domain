@@ -59,6 +59,17 @@ Example:
 EOF
 }
 
+# convert long month name to month number (Month Of Year)
+month2moy() {
+	awk -vmonth="$1" 'BEGIN {
+		split("January February March April May June July August Sepember October November December", months, " ");
+		for (i in months) {
+			Month[months[i]] = i;
+		}
+		print Month[month];
+	}'
+}
+
 while :; do
 	case "$1" in
 		-c|--critical) critical=$2; shift 2;;
@@ -101,6 +112,12 @@ case "$domain" in
 	# Expiry date: 2017/07/16
 	expiration=$(echo "$out" | awk '/Expiry date:/{split($3, a, "/"); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
 	;;
+*.ie)
+	# renewal: 31-March-2016
+	set -- $(echo "$out" | awk '/renewal:/{split($2, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
+	set -- "$1" "$(month2moy $2)" "$3"
+	expiration="$1-$2-$3"
+	;;
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
@@ -117,7 +134,7 @@ expdays=$((diffseconds/86400))
 # Trigger alarms if applicable
 [ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain expired on $expiration"
 [ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain will expire in $expdays days ($expdate)."
-[ $expdays -lt $warning ]&& die $STATE_WARNING "WARNING - Domain will expire in $expdays days ($expdate)."
+[ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
 echo "OK - Domain will expire in $expdays days ($expdate)."
