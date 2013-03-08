@@ -123,7 +123,7 @@ case "$domain" in
 	;;
 esac
 
-[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Domain doesn't exist or no WHOIS server available."
+[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 expseconds=$(date +%s --date="$expiration")
 expdate=$(date +'%Y-%m-%d' --date="$expiration")
@@ -132,10 +132,10 @@ diffseconds=$((expseconds-nowseconds))
 expdays=$((diffseconds/86400))
 
 # Trigger alarms if applicable
-[ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain expired on $expiration"
-[ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain will expire in $expdays days ($expdate)."
-[ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain will expire in $expdays days ($expdate)."
+[ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain $domain expired on $expiration"
+[ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain $domain will expire in $expdays days ($expdate)."
+[ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain $domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
-echo "OK - Domain will expire in $expdays days ($expdate)."
+echo "OK - Domain $domain will expire in $expdays days ($expdate)."
 exit $STATE_OK
