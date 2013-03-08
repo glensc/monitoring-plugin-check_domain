@@ -1,4 +1,12 @@
 #!/bin/sh
+# Nagios plugin for checking a domain name expiration date
+#
+# Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
+# 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
+#
+# Licensed under GPL v2 License
+# URL: http://git.pld-linux.org/?p=packages/nagios-plugin-check_domain.git;a=summary
+
 PROGRAM=${0##*/}
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
