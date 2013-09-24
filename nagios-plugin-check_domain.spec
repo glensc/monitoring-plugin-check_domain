@@ -5,7 +5,7 @@ Version:	1.2.3
 Release:	1
 License:	GPL
 Group:		Networking
-Source0:	%{plugin}
+Source0:	%{plugin}.sh
 Source1:	%{plugin}.cfg
 URL:		http://www.tomas.cat/blog/en/checking-domain-name-expiration-date-checkdomain
 Requires:	whois

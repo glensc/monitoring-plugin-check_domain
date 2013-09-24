@@ -20,5 +20,5 @@ amazon.co.uk
 "
 
 for domain in $domains; do
-	sh -$- ./check_domain -d $domain
+	sh -$- ./check_domain.sh -d $domain
 done
