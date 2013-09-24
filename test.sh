@@ -17,6 +17,7 @@ delfi.tv
 amazon.ca
 amazon.ie
 amazon.co.uk
+dk-hostmaster.dk
 "
 
 for domain in $domains; do

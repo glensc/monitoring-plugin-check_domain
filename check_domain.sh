@@ -33,7 +33,7 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.3
+check_domain - v1.2.4
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
 under GPL License
 
@@ -130,6 +130,10 @@ case "$domain" in
 	set -- $(echo "$out" | awk '/renewal:/{split($2, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
 	set -- "$1" "$(month2moy $2)" "$3"
 	expiration="$1-$2-$3"
+	;;
+*.dk)
+	# Expires: 2014-01-31
+	expiration=$(echo "$out" | awk '/Expires:/ {print $2}')
 	;;
 *.uk)
 	# Expiry date:  05-Dec-2014
