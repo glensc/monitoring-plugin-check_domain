@@ -113,17 +113,20 @@ out=$($whois $domain)
 # Calculate days until expiration
 case "$domain" in
 *.ru)
-	expiration=$(echo "$out" | awk '/paid-till:/{split($2, a, "."); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
+	# paid-till: 2013.11.01
+	expiration=$(echo "$out" | sed -rne 's;paid-till:[^0-9]+([0-9]{4})\.([0-9]{1,2})\.([0-9]{2});\1-\2-\3;p')
 	;;
 *.ee)
-	expiration=$(echo "$out" | awk '/expire:/{split($2, a, "."); printf("%s-%s-%s\n", a[3], a[2], a[1])}')
+	# expire: 16.11.2013
+	expiration=$(echo "$out" | sed -rne 's;expire:[^0-9]+([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{4});\3-\2-\1;p')
 	;;
 *.tv)
-	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 3, 10)}')
+	# Expiration Date: 2017-01-26T10:14:11Z
+	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p')
 	;;
 *.ca)
 	# Expiry date: 2017/07/16
-	expiration=$(echo "$out" | awk '/Expiry date:/{split($3, a, "/"); printf("%s-%s-%s\n", a[1], a[2], a[3])}')
+	expiration=$(echo "$out" | sed -rne 's;Expiry date:[^0-9]+([0-9]{4})/([0-9]{1,2})/([0-9]{2});\1-\2-\3;p')
 	;;
 *.ie)
 	# renewal: 31-March-2016
