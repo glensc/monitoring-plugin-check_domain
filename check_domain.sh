@@ -33,7 +33,7 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.4
+check_domain - v1.2.5
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
 under GPL License
 
@@ -116,10 +116,12 @@ case "$domain" in
 	# paid-till: 2013.11.01
 	expiration=$(echo "$out" | sed -rne 's;paid-till:[^0-9]+([0-9]{4})\.([0-9]{1,2})\.([0-9]{2});\1-\2-\3;p')
 	;;
+
 *.ee)
 	# expire: 16.11.2013
 	expiration=$(echo "$out" | sed -rne 's;expire:[^0-9]+([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{4});\3-\2-\1;p')
 	;;
+
 *.tv)
 	# Expiration Date: 2017-01-26T10:14:11Z
 	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p')
@@ -128,16 +130,27 @@ case "$domain" in
 	# Expiry date: 2017/07/16
 	expiration=$(echo "$out" | sed -rne 's;Expiry date:[^0-9]+([0-9]{4})/([0-9]{1,2})/([0-9]{2});\1-\2-\3;p')
 	;;
+
 *.ie)
 	# renewal: 31-March-2016
 	set -- $(echo "$out" | awk '/renewal:/{split($2, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
 	set -- "$1" "$(month2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
+
 *.dk)
 	# Expires: 2014-01-31
 	expiration=$(echo "$out" | awk '/Expires:/ {print $2}')
 	;;
+
+*.ac.uk|*.gov.uk)
+	# Renewal date:
+	#   Monday 21st Sep 2015
+	set -- $(echo "$out" | awk '/Renewal date:/{renewal = 1; next} {if (renewal) {print $0; exit}}')
+	set -- "$4" "$(mon2moy $3)" $(echo "$2" | sed -re 's,[^0-9]+,,')
+	expiration="$1-$2-$3"
+	;;
+
 *.uk)
 	# Expiry date:  05-Dec-2014
 	set -- $(echo "$out" | awk '/Expiry date:/{split($3, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
