@@ -157,6 +157,14 @@ case "$domain" in
 	set -- "$1" "$(mon2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
+
+*.is)
+	# expires:      March  5 2014
+	set -- $(echo "$out" | sed -E "s/\\s+/ /g" | awk '/expires:/{print($4, $2, $3)}')
+	set -- "$1" "$(month2moy $2)" "$3"
+	expiration="$1-$2-$3"
+	;;
+
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
