@@ -62,7 +62,7 @@ EOF
 # convert long month name to month number (Month Of Year)
 month2moy() {
 	awk -vmonth="$1" 'BEGIN {
-		split("January February March April May June July August Sepember October November December", months, " ");
+		split("January February March April May June July August September October November December", months, " ");
 		for (i in months) {
 			Month[months[i]] = i;
 		}
@@ -157,6 +157,14 @@ case "$domain" in
 	set -- "$1" "$(mon2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
+
+*.is)
+	# expires:      March  5 2014
+	set -- $(echo "$out" | sed -E "s/\\s+/ /g" | awk '/expires:/{print($4, $2, $3)}')
+	set -- "$1" "$(month2moy $2)" "$3"
+	expiration="$1-$2-$3"
+	;;
+
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
