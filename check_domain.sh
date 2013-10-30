@@ -62,7 +62,7 @@ EOF
 # convert long month name to month number (Month Of Year)
 month2moy() {
 	awk -vmonth="$1" 'BEGIN {
-		split("January February March April May June July August Sepember October November December", months, " ");
+		split("January February March April May June July August September October November December", months, " ");
 		for (i in months) {
 			Month[months[i]] = i;
 		}
