@@ -19,6 +19,7 @@ amazon.ie
 amazon.co.uk
 dk-hostmaster.dk
 bbk.ac.uk
+isnic.is
 "
 
 for domain in $domains; do
