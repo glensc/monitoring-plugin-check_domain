@@ -21,6 +21,6 @@ dk-hostmaster.dk
 bbk.ac.uk
 "
 
-for domain in $domains; do
+for domain in ${*:-$domains}; do
 	sh -$- ./check_domain.sh -d $domain
 done
