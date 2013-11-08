@@ -106,7 +106,52 @@ else
 	whois="$whoispath/whois"
 fi
 
-out=$($whois $domain)
+# flags used with a traditional server.
+#
+# some issues may occur if we don't do this depending on the Registrar WHOIS Server
+# some of them reply with different strings
+# that returns:
+# 
+#	date: invalid date ` 22-feb-2014\n 2014-02-22 13:34:43'
+#	date: invalid date ` 22-feb-2014\n 2014-02-22 13:34:43'
+#
+# Example:
+# THIS will break -> string returned: 22-feb-2014 2014-02-22 13:34:43 (fail!)
+#
+#	Registrar: TUCOWS DOMAINS INC.
+#	Whois Server: whois.tucows.com
+#	Referral URL: http://domainhelp.opensrs.net
+#	Name Server: NS0.UKFAST.NET
+#	Name Server: NS1.UKFAST.NET
+#	Status: ok
+#	Updated Date: 01-feb-2013
+#	Creation Date: 22-feb-2000
+#	Expiration Date: 22-feb-2014
+# The Registry database contains ONLY .COM, .NET, .EDU domains and
+# Registrars.
+# Domain Name: T
+# Registry Domain ID:
+# Registrar WHOIS Server: whois.tucows.com
+# Registrar URL: http://tucowsdomains.com
+# Updated Date: 2013-02-01 09:56:30
+# Creation Date: 2000-02-22 13:34:43
+# Registrar Registration Expiration Date: 2014-02-22 13:34:43
+# 
+# Other WHOIS Server from a different registrar
+# THIS works! > returned 
+#
+#   Registrar: EASYSPACE LTD.
+#   Whois Server: whois.easyspace.com
+#   Referral URL: http://www.easyspace.com
+#   Name Server: NS1.NAMECITY.COM
+#   Name Server: NS2.NAMECITY.COM
+#   Status: clientTransferProhibited
+#   Status: clientUpdateProhibited
+#   Updated Date: 11-jun-2009
+#   Creation Date: 05-mar-2007
+#   Expiration Date: 05-mar-2019
+
+out=$($whois -h whois.internic.org $domain)
 
 [ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
