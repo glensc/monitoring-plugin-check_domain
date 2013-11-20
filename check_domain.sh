@@ -123,8 +123,8 @@ case "$domain" in
 	;;
 
 *.tv)
-	# Expiration Date: 2017-01-26T10:14:11Z
-	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p')
+	# Registrar Registration Expiration Date: 2017-01-26
+	expiration=$(echo "$out" | sed -rne 's;Registrar Registration Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2});\1;p')
 	;;
 *.ca)
 	# Expiry date: 2017/07/16
