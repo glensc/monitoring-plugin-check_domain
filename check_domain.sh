@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 # Nagios plugin for checking a domain name expiration date
 #
 # Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
@@ -110,6 +110,7 @@ out=$($whois $domain)
 
 [ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
+
 # Calculate days until expiration
 case "$domain" in
 *.ru)
@@ -123,8 +124,8 @@ case "$domain" in
 	;;
 
 *.tv)
-	# Expiration Date: 2017-01-26T10:14:11Z
-	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p')
+	# Registrar Registration Expiration Date: 2017-01-26
+	expiration=$(echo "$out" | sed -rne 's;Registrar Registration Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2});\1;p')
 	;;
 *.ca)
 	# Expiry date: 2017/07/16
@@ -157,12 +158,18 @@ case "$domain" in
 	set -- "$1" "$(mon2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
+
+*.io)
+	# Expiry : 2018-09-24
+	expiration=$(echo "$out" | awk -F':' '/Expires :/ { print $2 }' | sed 's/^ *//g' )
+	;;
+
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
 	;;
 esac
 
-[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Unable to figure out expiration date for $domain Domain."
+[ -z "$expiration" ] &&	die $STATE_UNKNOWN "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
 expseconds=$(date +%s --date="$expiration")
 expdate=$(date +'%Y-%m-%d' --date="$expiration")
@@ -176,5 +183,6 @@ expdays=$((diffseconds/86400))
 [ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain $domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
-echo "OK - Domain $domain will expire in $expdays days ($expdate)."
+echo "OK - Domain $domain will expire in $expdays days ($expdate)." 
+echo "$domain $expdays" >> tlds.txt
 exit $STATE_OK
