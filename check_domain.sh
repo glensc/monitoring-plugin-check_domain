@@ -183,5 +183,6 @@ expdays=$((diffseconds/86400))
 [ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain $domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
-echo "OK - Domain $domain will expire in $expdays days ($expdate)."
+echo "OK - Domain $domain will expire in $expdays days ($expdate)." 
+echo "$domain $expdays" >> tlds.txt
 exit $STATE_OK
