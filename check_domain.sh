@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 # Nagios plugin for checking a domain name expiration date
 #
 # Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
@@ -156,6 +156,11 @@ case "$domain" in
 	set -- $(echo "$out" | awk '/Expiry date:/{split($3, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
 	set -- "$1" "$(mon2moy $2)" "$3"
 	expiration="$1-$2-$3"
+	;;
+
+*.io)
+	# Expiry : 2018-09-24
+	expiration=$(awk -F':' '/Expires :/ { print $2 }' | sed 's/^ *//g' )
 	;;
 *)
 	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
