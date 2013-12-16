@@ -124,7 +124,7 @@ case "$domain" in
 
 *.tv)
 	# Expiration Date: 2017-01-26T10:14:11Z
-	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p')
+	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p' | head -n1)
 	;;
 *.ca)
 	# Expiry date: 2017/07/16
