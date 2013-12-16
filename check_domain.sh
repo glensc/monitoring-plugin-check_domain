@@ -158,7 +158,8 @@ case "$domain" in
 	expiration="$1-$2-$3"
 	;;
 *)
-	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2)}')
+	# Expiration Date: 21-sep-2018
+	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2); exit}')
 	;;
 esac
 
