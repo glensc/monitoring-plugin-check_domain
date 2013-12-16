@@ -33,7 +33,7 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.5
+check_domain - v1.2.6
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
 under GPL License
 
