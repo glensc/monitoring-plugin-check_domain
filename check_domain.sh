@@ -2,7 +2,7 @@
 # Nagios plugin for checking a domain name expiration date
 #
 # Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
-# 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
+# 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 #
 # Licensed under GPL v2 License
 # URL: http://git.pld-linux.org/?p=packages/nagios-plugin-check_domain.git;a=summary
@@ -33,8 +33,8 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.6
-Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2013 Elan Ruusamäe <glen@pld-linux.org>
+check_domain - v1.2.7
+Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 under GPL License
 
 This plugin checks the expiration date of a domain name.
@@ -159,7 +159,8 @@ case "$domain" in
 	;;
 *)
 	# Expiration Date: 21-sep-2018
-	expiration=$(echo "$out" | awk -F: '/Expiration Date:/{print substr($0, length($1) + 2); exit}')
+	# Registry Expiry Date: 2015-08-03T04:00:00Z
+	expiration=$(echo "$out" | awk -F: '/Expir(ation|y) Date:/{print substr($0, length($1) + 2); exit}')
 	;;
 esac
 

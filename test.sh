@@ -20,6 +20,7 @@ amazon.co.uk
 dk-hostmaster.dk
 bbk.ac.uk
 cnn.com
+gimp.org
 "
 
 for domain in ${*:-$domains}; do
