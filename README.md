@@ -18,3 +18,7 @@ OK - Domain github.io will expire in 43 days (2014-03-08).
 5. Create a new pull request.
 
 Do not update changelog or attempt to change version.
+
+## Directory Listings
+
+  * [Nagios Exchange](http://exchange.nagios.org/directory/Plugins/Internet-Domains-and-WHOIS/check_domain/details)
