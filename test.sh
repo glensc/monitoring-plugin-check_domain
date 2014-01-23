@@ -22,6 +22,7 @@ bbk.ac.uk
 cnn.com
 gimp.org
 isnic.is
+github.io
 "
 
 for domain in ${*:-$domains}; do

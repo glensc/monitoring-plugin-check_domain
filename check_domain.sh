@@ -165,6 +165,11 @@ case "$domain" in
 	expiration="$1-$2-$3"
 	;;
 
+*.io)
+	# Expiry : 2014-03-08
+	expiration=$(echo "$out" | awk -F: '/Expir(ation|y)/{print $2}')
+	;;
+
 *)
 	# Expiration Date: 21-sep-2018
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
