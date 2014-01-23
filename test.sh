@@ -21,6 +21,7 @@ dk-hostmaster.dk
 bbk.ac.uk
 cnn.com
 gimp.org
+isnic.is
 "
 
 for domain in ${*:-$domains}; do
