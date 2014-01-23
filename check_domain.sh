@@ -5,7 +5,7 @@
 # 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 #
 # Licensed under GPL v2 License
-# URL: http://git.pld-linux.org/?p=packages/nagios-plugin-check_domain.git;a=summary
+# URL: https://github.com/pld-linux/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
 PROGPATH=${0%/*}
@@ -35,7 +35,7 @@ fullusage() {
 	cat <<EOF
 check_domain - v1.2.7
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
-under GPL License
+Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
 
