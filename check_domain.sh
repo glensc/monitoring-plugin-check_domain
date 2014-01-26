@@ -118,21 +118,21 @@ out=$($whois $domain)
 case "$domain" in
 *.ru)
 	# paid-till: 2013.11.01
-	expiration=$(echo "$out" | sed -rne 's;paid-till:[^0-9]+([0-9]{4})\.([0-9]{1,2})\.([0-9]{2});\1-\2-\3;p')
+	expiration=$(echo "$out" | awk '/paid-till:/ {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3])}')
 	;;
 
 *.ee)
 	# expire: 16.11.2013
-	expiration=$(echo "$out" | sed -rne 's;expire:[^0-9]+([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{4});\3-\2-\1;p')
+	expiration=$(echo "$out" | awk '/expire:/ {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1])}')
 	;;
 
 *.tv)
 	# Expiration Date: 2017-01-26T10:14:11Z
-	expiration=$(echo "$out" | sed -rne 's;Expiration Date:[^0-9]+([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9:Z]+;\1;p' | head -n1)
+	expiration=$(echo "$out" | awk '/Expiration Date/ {split($3, a, "-"); a[3]=substr(a[3],0,2);printf("%s-%s-%s", a[1], a[2], a[3]); exit}')
 	;;
 *.ca)
 	# Expiry date: 2017/07/16
-	expiration=$(echo "$out" | sed -rne 's;Expiry date:[^0-9]+([0-9]{4})/([0-9]{1,2})/([0-9]{2});\1-\2-\3;p')
+	expiration=$(echo "$out" | awk '/Expiry date:/ {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}')
 	;;
 
 *.ie)
@@ -150,8 +150,8 @@ case "$domain" in
 *.ac.uk|*.gov.uk)
 	# Renewal date:
 	#   Monday 21st Sep 2015
-	set -- $(echo "$out" | awk '/Renewal date:/{renewal = 1; next} {if (renewal) {print $0; exit}}')
-	set -- "$4" "$(mon2moy $3)" $(echo "$2" | sed -re 's,[^0-9]+,,')
+	set -- $(echo "$out" | awk '/Renewal date:/{renewal = 1; next} {if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s %s %s", $4, $3, $2); ; exit}}')
+	set -- "$1" "$(mon2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
 
@@ -164,7 +164,7 @@ case "$domain" in
 
 *.is)
 	# expires:      March  5 2014
-	set -- $(echo "$out" | sed -E "s/\\s+/ /g" | awk '/expires:/{print($4, $2, $3)}')
+	set -- $(echo "$out" | awk '/expires:/{print($4, $2, $3)}')
 	set -- "$1" "$(month2moy $2)" "$3"
 	expiration="$1-$2-$3"
 	;;
