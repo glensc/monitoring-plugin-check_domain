@@ -25,6 +25,7 @@ isnic.is
 github.io
 "
 
+whois=$(pwd)/whois.sh
 for domain in ${*:-$domains}; do
-	sh -$- ./check_domain.sh -d $domain
+	sh -$- ./check_domain.sh -d $domain -P $whois
 done
