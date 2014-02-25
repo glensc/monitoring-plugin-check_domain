@@ -22,7 +22,7 @@ bbk.ac.uk
 cnn.com
 gimp.org
 isnic.is
-github.io
+drop.io
 "
 
 whois=$(pwd)/whois.sh

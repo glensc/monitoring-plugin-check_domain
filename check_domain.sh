@@ -33,7 +33,7 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.7
+check_domain - v1.2.8
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 Under GPL v2 License
 
@@ -177,7 +177,7 @@ case "$domain" in
 *)
 	# Expiration Date: 21-sep-2018
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
-	expiration=$(echo "$out" | awk -F: '/Expir(ation|y) Date:/{print substr($0, length($1) + 2); exit}')
+	expiration=$(echo "$out" | awk -F: '/Expir(ation|y) Date:/{s=substr($0, length($1) + 2); if (split(s,d,/T/)) print d[1]; exit}')
 	;;
 esac
 
