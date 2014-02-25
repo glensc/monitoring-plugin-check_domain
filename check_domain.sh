@@ -5,7 +5,7 @@
 # 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 #
 # Licensed under GPL v2 License
-# URL: https://github.com/pld-linux/nagios-plugin-check_domain
+# URL: https://github.com/glensc/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
 PROGPATH=${0%/*}
