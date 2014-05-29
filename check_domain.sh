@@ -175,6 +175,11 @@ case "$domain" in
 	expiration=$(echo "$out" | awk -F: '/Expir(ation|y)/{print $2}')
 	;;
 
+*.sk)
+        # Valid-date          2014-10-21
+        expiration=$(echo "$out" | awk '/Valid-date/ {print $2}')
+        ;;
+
 *)
 	# Expiration Date: 21-sep-2018
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
