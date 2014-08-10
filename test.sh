@@ -12,6 +12,7 @@ cnn.com
 gimp.org
 isnic.is
 drop.io
+google.sk
 "
 
 whois=$(pwd)/whois.sh
