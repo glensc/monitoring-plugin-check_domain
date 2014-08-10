@@ -2,7 +2,7 @@
 # Nagios plugin for checking a domain name expiration date
 #
 # Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
-# 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
+# Copyright (c) 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 #
 # Licensed under GPL v2 License
 # URL: https://github.com/glensc/nagios-plugin-check_domain
@@ -33,8 +33,9 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.2.9
-Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>, 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
+check_domain - v1.3.0
+Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
+Copyright (c) 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
@@ -57,28 +58,6 @@ Example:
      $PROGRAM -d domain.tld -w 30 -c 10
 
 EOF
-}
-
-# convert long month name to month number (Month Of Year)
-month2moy() {
-	awk -vmonth="$1" 'BEGIN {
-		split("January February March April May June July August September October November December", months, " ");
-		for (i in months) {
-			Month[months[i]] = i;
-		}
-		print Month[month];
-	}'
-}
-
-# convert short month name to month number (Month Of Year)
-mon2moy() {
-	awk -vmonth="$1" 'BEGIN {
-		split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", months, " ");
-		for (i in months) {
-			Month[months[i]] = i;
-		}
-		print Month[month];
-	}'
 }
 
 while :; do
@@ -115,77 +94,75 @@ out=$($whois $domain)
 [ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # Calculate days until expiration
-case "$domain" in
-*.ru)
-	# paid-till: 2013.11.01
-	expiration=$(echo "$out" | awk '/paid-till:/ {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3])}')
-	;;
+expiration=$(
+	echo "$out" | awk '
+	BEGIN {
+		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9][0-9][0-9]"
+		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
+		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
+		DATE_ISO_LIKE = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] "
+		DATE_YYYY_MM_DD_DASH = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
+		DATE_YYYY_MM_DD_DOT = "[0-9][0-9][0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]"
+		DATE_YYYY_MM_DD_SLASH = "[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]"
 
-*.ee)
-	# expire: 16.11.2013
-	expiration=$(echo "$out" | awk '/expire:/ {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1])}')
-	;;
+		split("January February March April May June July August September October November December", months, " ");
+		for (i in months) {
+			Month[months[i]] = i;
+		}
 
-*.tv)
-	# Expiration Date: 2017-01-26T10:14:11Z
-	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
-	expiration=$(echo "$out" | awk '/Expiration Date/ {split($NF, a, "-"); a[3]=substr(a[3],0,2);printf("%s-%s-%s", a[1], a[2], a[3]); exit}')
-	;;
-*.ca)
-	# Expiry date: 2017/07/16
-	expiration=$(echo "$out" | awk '/Expiry date:/ {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}')
-	;;
+		split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", months, " ");
+		for (i in months) {
+			Mon[months[i]] = i;
+		}
+	}
 
-*.ie)
-	# renewal: 31-March-2016
-	set -- $(echo "$out" | awk '/renewal:/{split($2, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
-	set -- "$1" "$(month2moy $2)" "$3"
-	expiration="$1-$2-$3"
-	;;
+	# convert short month name to month number (Month Of Year)
+	function mon2moy(month) {
+		return Mon[month]
+	}
 
-*.dk)
-	# Expires: 2014-01-31
-	expiration=$(echo "$out" | awk '/Expires:/ {print $2}')
-	;;
+	# convert long month name to month number (Month Of Year)
+	function month2moy(month) {
+		return Month[month]
+	}
 
-*.ac.uk|*.gov.uk)
 	# Renewal date:
 	#   Monday 21st Sep 2015
-	set -- $(echo "$out" | awk '/Renewal date:/{renewal = 1; next} {if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s %s %s", $4, $3, $2); ; exit}}')
-	set -- "$1" "$(mon2moy $2)" "$3"
-	expiration="$1-$2-$3"
-	;;
+	/Renewal date:/{renewal = 1; next}
+	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); ; exit}}
 
-*.uk)
 	# Expiry date:  05-Dec-2014
-	set -- $(echo "$out" | awk '/Expiry date:/{split($3, a, "-"); printf("%s %s %s\n", a[3], a[2], a[1])}')
-	set -- "$1" "$(mon2moy $2)" "$3"
-	expiration="$1-$2-$3"
-	;;
+	/Expiry date:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1])}
 
-*.is)
 	# expires:      March  5 2014
-	set -- $(echo "$out" | awk '/expires:/{print($4, $2, $3)}')
-	set -- "$1" "$(month2moy $2)" "$3"
-	expiration="$1-$2-$3"
-	;;
+	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
 
-*.io)
-	# Expiry : 2014-03-08
-	expiration=$(echo "$out" | awk -F: '/Expir(ation|y)/{print $2}')
-	;;
+	# renewal: 31-March-2016
+	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
 
-*.sk)
-        # Valid-date          2014-10-21
-        expiration=$(echo "$out" | awk '/Valid-date/ {print $2}')
-        ;;
+	# paid-till: 2013.11.01
+	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DOT {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
-*)
-	# Expiration Date: 21-sep-2018
+	# expire: 16.11.2013
+	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
+	# Expiration Date: 2017-01-26T10:14:11Z
+	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
+	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
+	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
-	expiration=$(echo "$out" | awk -F: '/Expir(ation|y) Date:/{s=substr($0, length($1) + 2); if (split(s,d,/T/)) print d[1]; exit}')
-	;;
-esac
+	# Registry Expiry Date: 2017-01-26T10:14:11Z
+	$0 ~ "Expiry Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
+	# Expiry date: 2017/07/16
+	/Expiry date:/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+
+	# Expires: 2014-01-31
+	# Expiry : 2014-03-08
+	# Valid-date          2014-10-21
+	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+')
 
 [ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
