@@ -8,6 +8,7 @@
 # URL: https://github.com/glensc/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
+VERSION=1.3.0
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
@@ -33,7 +34,7 @@ die() {
 
 fullusage() {
 	cat <<EOF
-check_domain - v1.3.0
+check_domain - v$VERSION
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com>,
 Copyright (c) 2009-2014 Elan Ruusamäe <glen@pld-linux.org>
 Under GPL v2 License
