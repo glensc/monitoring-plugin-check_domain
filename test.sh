@@ -1,18 +1,19 @@
 #!/bin/sh
 domains="
-mail.ru
-delfi.ee
-delfi.tv
 amazon.ca
-amazon.ie
 amazon.co.uk
-dk-hostmaster.dk
+amazon.ie
 bbk.ac.uk
 cnn.com
-gimp.org
-isnic.is
+delfi.ee
+delfi.tv
+dk-hostmaster.dk
 drop.io
+gimp.org
+google.com
 google.sk
+isnic.is
+mail.ru
 "
 
 whois=$(pwd)/whois.sh
