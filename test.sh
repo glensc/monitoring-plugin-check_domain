@@ -9,6 +9,7 @@ delfi.ee
 delfi.tv
 dk-hostmaster.dk
 drop.io
+getsynced.co
 gimp.org
 google.com
 google.sk

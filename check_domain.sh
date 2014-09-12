@@ -8,7 +8,7 @@
 # URL: https://github.com/glensc/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
-VERSION=1.3.0
+VERSION=1.3.1
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
@@ -98,6 +98,8 @@ out=$($whois $domain)
 expiration=$(
 	echo "$out" | awk '
 	BEGIN {
+		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
+		YYYY = "[0-9][0-9][0-9][0-9]"
 		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9][0-9][0-9]"
 		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
 		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
@@ -105,6 +107,8 @@ expiration=$(
 		DATE_YYYY_MM_DD_DASH = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
 		DATE_YYYY_MM_DD_DOT = "[0-9][0-9][0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]"
 		DATE_YYYY_MM_DD_SLASH = "[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]"
+		# Wed Mar 02 23:59:59 GMT 2016
+		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
 
 		split("January February March April May June July August September October November December", months, " ");
 		for (i in months) {
@@ -151,6 +155,11 @@ expiration=$(
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
 	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
+	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
+	$0 ~ "Expiration Date: *" DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
+		printf("%s-%s-%s", $9, mon2moy($5), $6);
+	}
 
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
