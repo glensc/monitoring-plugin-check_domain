@@ -15,6 +15,7 @@ google.com
 google.sk
 isnic.is
 mail.ru
+phonedot.mobi
 "
 
 whois=$(pwd)/whois.sh

@@ -8,7 +8,7 @@
 # URL: https://github.com/glensc/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
-VERSION=1.3.1
+VERSION=1.3.2
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
@@ -100,6 +100,8 @@ expiration=$(
 	BEGIN {
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
 		YYYY = "[0-9][0-9][0-9][0-9]"
+		DD = "[0-9][0-9]"
+		MON = "[A-Z][a-z][a-z]"
 		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9][0-9][0-9]"
 		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
 		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
@@ -109,6 +111,8 @@ expiration=$(
 		DATE_YYYY_MM_DD_SLASH = "[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]"
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
+		# 02-May-2018 16:12:25 UTC
+		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
 
 		split("January February March April May June July August September October November December", months, " ");
 		for (i in months) {
@@ -159,6 +163,13 @@ expiration=$(
 	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
 	$0 ~ "Expiration Date: *" DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
 		printf("%s-%s-%s", $9, mon2moy($5), $6);
+	}
+
+	# Expiration Date:02-May-2018 16:12:25 UTC
+	$0 ~ "Expiration Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ {
+		sub(/Date:/, "Date: ")
+		split($3, a, "-");
+		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
 
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
