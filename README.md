@@ -1,7 +1,7 @@
-Nagios Plugin: check\_domain
-============================
+Nagios/Icinga Plugin: check\_domain
+===================================
 
-Nagios plugin for checking a domain name expiration date
+Nagios/Icinga plugin for checking a domain name expiration date
 
 Usage:
 ```
