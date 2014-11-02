@@ -143,6 +143,9 @@ expiration=$(
 	# Expiry date:  05-Dec-2014
 	/Expiry date:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1])}
 
+	# expires:	2015-11-18
+	/expires:[ ]+[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+
 	# expires:      March  5 2014
 	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
 
