@@ -17,6 +17,7 @@ isnic.is
 mail.ru
 phonedot.mobi
 trashmail.se
+trashmail.im
 "
 
 whois=$(pwd)/whois.sh
