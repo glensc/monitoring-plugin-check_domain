@@ -18,6 +18,7 @@ mail.ru
 panel.li:whois.name.com
 phonedot.mobi
 trashmail.se
+trashmail.im
 "
 
 whois=$(pwd)/whois.sh
