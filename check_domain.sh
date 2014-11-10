@@ -8,7 +8,7 @@
 # URL: https://github.com/glensc/nagios-plugin-check_domain
 
 PROGRAM=${0##*/}
-VERSION=1.3.3
+VERSION=1.3.4
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
