@@ -17,7 +17,7 @@ critical=7
 warning=30
 
 # Parse arguments
-args=$(getopt -o hd:w:c:P: --long help,domain:,warning:,critical:,path: -u -n $PROGRAM -- "$@")
+args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n $PROGRAM -- "$@")
 if [ $? != 0 ]; then
 	echo >&2 "$PROGRAM: Could not parse arguments"
 	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
@@ -69,7 +69,7 @@ while :; do
 		-w|--warning)  warning=$2; shift 2;;
 		-d|--domain)   domain=$2; shift 2;;
 		-P|--path)     whoispath=$2; shift 2;;
-		-s|--server)   whois-server=$2; shift 2;;
+		-s|--server)   server=$2; shift 2;;
 		-h|--help)     fullusage; exit;;
 		--) shift; break;;
 		*)  die $STATE_UNKNOWN "Internal error!";;
@@ -93,7 +93,7 @@ else
 	whois=whois
 fi
 
-out=$($whois -h $whois-server $domain)
+out=$($whois ${server:+-h $server} $domain)
 
 [ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
