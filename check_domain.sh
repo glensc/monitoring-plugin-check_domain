@@ -162,8 +162,11 @@ expiration=$(
 	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
 	# Expiration Date: 2017-01-26T10:14:11Z
-	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
+	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
+	$0 ~ "Expiration Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
+	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 
 	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
