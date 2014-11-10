@@ -41,19 +41,19 @@ Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
 
-Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]
+Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-s <server>]
 NOTE: -d must be specified
 
 Options:
--h
+-h, --help
      Print detailed help
--d
+-d, --domain
      Domain name to check
--w
+-w, --warning
      Response time to result in warning status (days)
--c
+-c, --critical
      Response time to result in critical status (days)
--s
+-s, --server
      Specific Whois server for domain name check 
      
 This plugin will use whois service to get the expiration date for the domain name.
