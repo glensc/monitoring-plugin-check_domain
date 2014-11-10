@@ -15,11 +15,15 @@ google.com
 google.sk
 isnic.is
 mail.ru
+panel.li:whois.name.com
 phonedot.mobi
 trashmail.se
 "
 
 whois=$(pwd)/whois.sh
 for domain in ${*:-$domains}; do
-	sh -$- ./check_domain.sh -d $domain -P $whois
+	server=${domain##*:}
+	domain=${domain%%:*}
+	server=${server#$domain}
+	sh -$- ./check_domain.sh -d $domain ${server:+-s $server} -P $whois
 done
