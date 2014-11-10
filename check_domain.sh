@@ -53,7 +53,9 @@ Options:
      Response time to result in warning status (days)
 -c
      Response time to result in critical status (days)
-
+-s
+     Specific Whois server for domain name check 
+     
 This plugin will use whois service to get the expiration date for the domain name.
 Example:
      $PROGRAM -d domain.tld -w 30 -c 10
@@ -67,6 +69,7 @@ while :; do
 		-w|--warning)  warning=$2; shift 2;;
 		-d|--domain)   domain=$2; shift 2;;
 		-P|--path)     whoispath=$2; shift 2;;
+		-s|--server)   whois-server=$2; shift 2;;
 		-h|--help)     fullusage; exit;;
 		--) shift; break;;
 		*)  die $STATE_UNKNOWN "Internal error!";;
@@ -90,7 +93,7 @@ else
 	whois=whois
 fi
 
-out=$($whois $domain)
+out=$($whois -h $whois-server $domain)
 
 [ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
