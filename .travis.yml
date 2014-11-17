@@ -1,11 +1,12 @@
 before_install:
   - sudo apt-get update
-  - sudo apt-get install whois gawk mawk
+  - sudo apt-get install whois gawk mawk original-awk
 
 env:
   - AWK=awk
   - AWK=mawk
   - AWK=gawk
+  - AWK=original-awk
 
 script:
   - ./test.sh
