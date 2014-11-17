@@ -1,0 +1,8 @@
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install whois
+
+script:
+  - ./test.sh
+
+# vim:ts=2:sw=2:et
