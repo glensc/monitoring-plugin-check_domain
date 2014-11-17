@@ -22,9 +22,10 @@ trashmail.im
 "
 
 whois=$(pwd)/whois.sh
+sh=${SH:-/bin/sh}
 for domain in ${*:-$domains}; do
 	server=${domain##*:}
 	domain=${domain%%:*}
 	server=${server#$domain}
-	sh -$- ./check_domain.sh -d $domain ${server:+-s $server} -P $whois
+	$sh -$- ./check_domain.sh -d $domain ${server:+-s $server} -P $whois
 done

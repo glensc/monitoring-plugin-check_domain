@@ -1,12 +1,19 @@
 before_install:
   - sudo apt-get update
-  - sudo apt-get install whois gawk mawk original-awk
+  - sudo apt-get install whois
+  - sudo apt-get install gawk mawk original-awk
+  - sudo apt-get install mksh posh dash bash
 
 env:
   - AWK=awk
   - AWK=mawk
   - AWK=gawk
   - AWK=original-awk
+  - SH=sh
+  - SH=mksh
+  - SH=posh
+  - SH=dash
+  - SH=bash
 
 script:
   - ./test.sh
