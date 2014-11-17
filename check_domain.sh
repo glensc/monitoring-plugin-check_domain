@@ -16,6 +16,8 @@ PROGPATH=${0%/*}
 critical=7
 warning=30
 
+awk=${AWK:-awk}
+
 # Parse arguments
 args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n $PROGRAM -- "$@")
 if [ $? != 0 ]; then
@@ -99,7 +101,7 @@ out=$($whois ${server:+-h $server} $domain)
 
 # Calculate days until expiration
 expiration=$(
-	echo "$out" | awk '
+	echo "$out" | $awk '
 	BEGIN {
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
 		YYYY = "[0-9][0-9][0-9][0-9]"
