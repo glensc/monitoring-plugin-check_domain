@@ -77,12 +77,12 @@ while :; do
 		-s|--server)   server=$2; shift 2;;
 		-h|--help)     fullusage; exit;;
 		--) shift; break;;
-		*)  die $STATE_UNKNOWN "Internal error!";;
+		*)  die "$STATE_UNKNOWN" "Internal error!";;
 	esac
 done
 
 if [ -z $domain ]; then
-	die $STATE_UNKNOWN "UNKNOWN - There is no domain name to check"
+	die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
 fi
 
 # Looking for whois binary
@@ -92,15 +92,15 @@ if [ -n "$whoispath" ]; then
 	elif [ -x "$whoispath/whois" ]; then
 		whois=$whoispath/whois
 	fi
-	[ -n "$whois" ] || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
+	[ -n "$whois" ] || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
 else
-	type whois > /dev/null 2>&1 || die $STATE_UNKNOWN "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
+	type whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
 	whois=whois
 fi
 
 out=$($whois ${server:+-h $server} $domain)
 
-[ -z "$out" ] && die $STATE_UNKNOWN "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
+[ -z "$out" ] && die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # Calculate days until expiration
 expiration=$(
@@ -204,7 +204,7 @@ expiration=$(
 	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 ')
 
-[ -z "$expiration" ] && die $STATE_UNKNOWN "UNKNOWN - Unable to figure out expiration date for $domain Domain."
+[ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
 expseconds=$(date +%s --date="$expiration")
 expdate=$(date +'%Y-%m-%d' --date="$expiration")
@@ -213,9 +213,9 @@ diffseconds=$((expseconds-nowseconds))
 expdays=$((diffseconds/86400))
 
 # Trigger alarms if applicable
-[ $expdays -lt 0 ] && die $STATE_CRITICAL "CRITICAL - Domain $domain expired on $expiration"
-[ $expdays -lt $critical ] && die $STATE_CRITICAL "CRITICAL - Domain $domain will expire in $expdays days ($expdate)."
-[ $expdays -lt $warning ] && die $STATE_WARNING "WARNING - Domain $domain will expire in $expdays days ($expdate)."
+[ $expdays -lt 0 ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired on $expiration"
+[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate)."
+[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate)."
 
 # No alarms? Ok, everything is right.
 echo "OK - Domain $domain will expire in $expdays days ($expdate)."
