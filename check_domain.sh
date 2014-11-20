@@ -7,6 +7,9 @@
 # Licensed under GPL v2 License
 # URL: https://github.com/glensc/nagios-plugin-check_domain
 
+# fail on first error, do not continue
+set -e
+
 PROGRAM=${0##*/}
 VERSION=1.3.4
 PROGPATH=${0%/*}
