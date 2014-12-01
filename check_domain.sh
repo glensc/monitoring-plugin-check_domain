@@ -204,7 +204,7 @@ expiration=$(
 	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# [Expires on] 2014/12/01
-	/\[Expires on\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("\r", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/\[Expires on\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
 	# [State] Connected (2014/12/01)
 	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("[()]", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
