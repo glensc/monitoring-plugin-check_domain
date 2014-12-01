@@ -11,7 +11,7 @@
 set -e
 
 PROGRAM=${0##*/}
-VERSION=1.3.4
+VERSION=1.3.5
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
