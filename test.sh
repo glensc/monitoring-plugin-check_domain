@@ -19,6 +19,8 @@ panel.li:whois.name.com
 phonedot.mobi
 trashmail.se
 trashmail.im
+kyounoshikaku.jp
+sakura.ne.jp
 "
 
 whois=$(pwd)/whois.sh
