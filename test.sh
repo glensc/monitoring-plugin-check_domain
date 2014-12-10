@@ -21,6 +21,7 @@ trashmail.se
 trashmail.im
 kyounoshikaku.jp
 sakura.ne.jp
+nic.it
 "
 
 whois=$(pwd)/whois.sh
