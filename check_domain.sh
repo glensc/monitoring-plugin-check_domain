@@ -11,7 +11,7 @@
 set -e
 
 PROGRAM=${0##*/}
-VERSION=1.3.5
+VERSION=1.3.6
 PROGPATH=${0%/*}
 . $PROGPATH/utils.sh
 
@@ -77,7 +77,7 @@ while :; do
 		-s|--server)   server=$2; shift 2;;
 		-h|--help)     fullusage; exit;;
 		--) shift; break;;
-		*)  die "$STATE_UNKNOWN" "Internal error!";;
+		*) die "$STATE_UNKNOWN" "Internal error!";;
 	esac
 done
 
@@ -153,8 +153,8 @@ expiration=$(
 	# Expiry date:  05-Dec-2014
 	/Expiry date:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1])}
 
-    # Expire Date:  2015-10-22
-    /Expire Date:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+	# Expire Date:  2015-10-22
+	/Expire Date:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# expires:	2015-11-18
 	/expires:[ ]+/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
