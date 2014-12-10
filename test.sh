@@ -32,3 +32,5 @@ for domain in ${*:-$domains}; do
 	server=${server#$domain}
 	$sh -$- ./check_domain.sh -d $domain ${server:+-s $server} -P $whois
 done
+
+exit 0
