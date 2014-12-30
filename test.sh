@@ -1,5 +1,6 @@
 #!/bin/sh
 domains="
+aceonlinestore.com
 amazon.ca
 amazon.co.uk
 amazon.ie
@@ -13,6 +14,7 @@ getsynced.co
 gimp.org
 google.com
 google.sk
+greatestate.com
 isnic.is
 kyounoshikaku.jp
 mail.ru
