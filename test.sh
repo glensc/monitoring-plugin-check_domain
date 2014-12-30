@@ -14,14 +14,14 @@ gimp.org
 google.com
 google.sk
 isnic.is
+kyounoshikaku.jp
 mail.ru
+nic.it
 panel.li:whois.name.com
 phonedot.mobi
-trashmail.se
-trashmail.im
-kyounoshikaku.jp
 sakura.ne.jp
-nic.it
+trashmail.im
+trashmail.se
 "
 
 whois=$(pwd)/whois.sh
@@ -30,7 +30,9 @@ for domain in ${*:-$domains}; do
 	server=${domain##*:}
 	domain=${domain%%:*}
 	server=${server#$domain}
+	echo "-> $domain"
 	$sh -$- ./check_domain.sh -d $domain ${server:+-s $server} -P $whois
+	echo "<- $domain"
 done
 
 exit 0
