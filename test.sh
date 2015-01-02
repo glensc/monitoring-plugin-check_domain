@@ -24,6 +24,7 @@ phonedot.mobi
 sakura.ne.jp
 trashmail.im
 trashmail.se
+google.com.br
 "
 
 whois=$(pwd)/whois.sh
