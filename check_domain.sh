@@ -99,7 +99,6 @@ else
 fi
 
 out=$($whois ${server:+-h $server} $domain)
-
 [ -z "$out" ] && die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # Calculate days until expiration
@@ -109,9 +108,9 @@ expiration=$(
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
 		YYYY = "[0-9][0-9][0-9][0-9]"
 		DD = "[0-9][0-9]"
-		MON = "[A-Z][a-z][a-z]"
+		MON = "[A-Za-z][a-z][a-z]"
 		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9]"
-		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
+		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Za-z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
 		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
 		DATE_ISO_LIKE = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] "
 		DATE_YYYY_MM_DD_DASH = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
@@ -124,12 +123,12 @@ expiration=$(
 		# 02-May-2018 16:12:25 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
 
-		split("January February March April May June July August September October November December", months, " ");
+		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
 			Month[months[i]] = i;
 		}
 
-		split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", months, " ");
+		split("jan feb mar apr may jun jul aug sep oct nov dec", months, " ");
 		for (i in months) {
 			Mon[months[i]] = i;
 		}
@@ -137,21 +136,21 @@ expiration=$(
 
 	# convert short month name to month number (Month Of Year)
 	function mon2moy(month) {
-		return Mon[month]
+		return Mon[tolower(month)]
 	}
 
 	# convert long month name to month number (Month Of Year)
 	function month2moy(month) {
-		return Month[month]
+		return Month[tolower(month)]
 	}
 
 	# Renewal date:
 	#   Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
-	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); ; exit}}
+	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
 
 	# Expiry date:  05-Dec-2014
-	/Expiry date:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1])}
+	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
 
 	# Expire Date:  2015-10-22
 	/Expire Date:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
