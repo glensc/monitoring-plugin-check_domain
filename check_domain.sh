@@ -34,6 +34,7 @@ die() {
 	local rc=$1
 	local msg="$2"
 	echo "$msg"
+	test "$outfile" && rm -f "$outfile"
 	exit $rc
 }
 
@@ -68,6 +69,12 @@ Example:
 EOF
 }
 
+# create tempfile. as secure as possible
+# tempfile name is returned to stdout
+tempfile() {
+	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo ${TMPDIR:-/tmp}/check_domain.$RANDOM.$$
+}
+
 while :; do
 	case "$1" in
 		-c|--critical) critical=$2; shift 2;;
@@ -98,12 +105,13 @@ else
 	whois=whois
 fi
 
-out=$($whois ${server:+-h $server} $domain)
-[ -z "$out" ] && die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
+outfile=$(tempfile)
+$whois ${server:+-h $server} $domain > $outfile
+[ ! -s "$out" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # Calculate days until expiration
 expiration=$(
-	echo "$out" | $awk '
+	$awk '
 	BEGIN {
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
 		YYYY = "[0-9][0-9][0-9][0-9]"
@@ -214,7 +222,7 @@ expiration=$(
 
 	# [State] Connected (2014/12/01)
 	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("[()]", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-')
+' $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
