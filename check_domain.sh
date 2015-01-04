@@ -109,6 +109,11 @@ outfile=$(tempfile)
 $whois ${server:+-h $server} $domain > $outfile
 [ ! -s "$out" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
+# check for common errors
+if grep -q "Query rate limit exceeded. Reduced information." $outfile; then
+	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
+fi
+
 # Calculate days until expiration
 expiration=$(
 	$awk '
