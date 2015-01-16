@@ -96,7 +96,7 @@ fi
 
 # Looking for whois binary
 if [ -n "$whoispath" ]; then
-	if [ -f "$whoispath" ] && [ -x "$whoispath" ]; then
+	if [ -x "$whoispath" ]; then
 		whois=$whoispath
 	elif [ -x "$whoispath/whois" ]; then
 		whois=$whoispath/whois
