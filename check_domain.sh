@@ -25,7 +25,7 @@ awk=${AWK:-awk}
 args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n $PROGRAM -- "$@")
 if [ $? != 0 ]; then
 	echo >&2 "$PROGRAM: Could not parse arguments"
-	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>]"
+	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
 	exit 1
 fi
 set -- $args
@@ -47,7 +47,7 @@ Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
 
-Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-s <server>]
+Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]
 NOTE: -d must be specified
 
 Options:
@@ -59,6 +59,8 @@ Options:
      Response time to result in warning status (days)
 -c, --critical
      Response time to result in critical status (days)
+-P, --path
+     Path to whois binary
 -s, --server
      Specific Whois server for domain name check 
      
