@@ -201,6 +201,9 @@ expiration=$(
 	# expire: 16.11.2013
 	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
+	# expire: 2016-01-19
+	/expire:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+
 	# Expiration Date: 2017-01-26T10:14:11Z
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
 	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
