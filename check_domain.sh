@@ -68,8 +68,8 @@ Options:
 -P, --path
      Path to whois binary
 -s, --server
-     Specific Whois server for domain name check 
-     
+     Specific Whois server for domain name check
+
 This plugin will use whois service to get the expiration date for the domain name.
 Example:
      $PROGRAM -d domain.tld -w 30 -c 10
@@ -144,6 +144,8 @@ expiration=$(
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
 		# 02-May-2018 16:12:25 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
+		# 2016.01.14 18:47:31
+		DATE_YYYYMMDD_HHMMSS = DATE_YYYY_MM_DD_DOT " " HH_MM_DD
 
 		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
@@ -189,6 +191,9 @@ expiration=$(
 
 	# renewal: 31-March-2016
 	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
+
+	# renewal date: 2016.01.14 18:47:31
+	/renewal date:/ && $0 ~ DATE_YYYYMMDD_HHMMSS {split($(NF-1), a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
 	# paid-till: 2013.11.01
 	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DOT {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
