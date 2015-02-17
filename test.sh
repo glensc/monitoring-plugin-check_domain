@@ -4,6 +4,10 @@ aceonlinestore.com
 amazon.ca
 amazon.co.uk
 amazon.ie
+autoproff.gl
+autoproff.ir
+autoproff.pl
+autoproff.si
 bbk.ac.uk
 cnn.com
 delfi.ee
@@ -13,6 +17,7 @@ drop.io
 getsynced.co
 gimp.org
 google.com
+google.com.br
 google.sk
 greatestate.com
 isnic.is
@@ -24,7 +29,6 @@ phonedot.mobi
 sakura.ne.jp
 trashmail.im
 trashmail.se
-google.com.br
 "
 
 whois=$(pwd)/whois.sh
