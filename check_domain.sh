@@ -175,7 +175,8 @@ expiration=$(
 	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
 
 	# Expire Date:  2015-10-22
-	/Expire Date:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+	# expire-date:	2016-02-05
+	/[Ee]xpire[- ][Dd]ate:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# expires: 20170716
 	/expires:/ && $NF ~ DATE_YYYY_MM_DD_NIL  {printf("%s-%s-%s", substr($2,0,4), substr($2,5,2), substr($2,7,2)); exit}
