@@ -7,6 +7,7 @@ amazon.ie
 autoproff.gl
 autoproff.ir
 autoproff.pl
+autoproff.pt
 autoproff.si
 bbk.ac.uk
 cnn.com

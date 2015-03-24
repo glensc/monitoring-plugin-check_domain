@@ -212,6 +212,9 @@ expiration=$(
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 
+	# Data de expiração / Expiration Date (dd/mm/yyyy): 18/01/2016
+	$0 ~ "Expiration Date \(dd/mm/yyyy\)" {split($NF, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
 	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
 	$0 ~ "Expiration Date: *" DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
 		printf("%s-%s-%s", $9, mon2moy($5), $6);
