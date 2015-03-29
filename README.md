@@ -22,6 +22,22 @@ OK - Domain github.io will expire in 43 days (2014-03-08).
 
 Do not update changelog or attempt to change version.
 
+
+## Installing whois
+
+This plugin uses the "whois" command. It is usually installed by default, but if not, you can get it via your favourite package manager.
+
+Debian/Ubuntu: 
+```
+# apt-get install whois
+```
+
+RHEL/CentOS:
+```
+# yum install jwhois
+```
+
+
 ## Directory Listings
 
   * [Nagios Exchange](http://exchange.nagios.org/directory/Plugins/Internet-Domains-and-WHOIS/check_domain/details)
