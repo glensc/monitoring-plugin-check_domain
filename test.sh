@@ -31,6 +31,7 @@ phonedot.mobi
 sakura.ne.jp
 trashmail.im
 trashmail.se
+vbrpleugueneuc.fr
 "
 
 whois=$(pwd)/whois.sh
