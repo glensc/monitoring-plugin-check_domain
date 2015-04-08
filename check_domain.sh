@@ -146,6 +146,8 @@ expiration=$(
 		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
 		# 2016.01.14 18:47:31
 		DATE_YYYYMMDD_HHMMSS = DATE_YYYY_MM_DD_DOT " " HH_MM_DD
+		# 21/05/2017 00:00:00 EEST
+		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
 
 		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
@@ -247,6 +249,9 @@ expiration=$(
 
 	# [State] Connected (2014/12/01)
 	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("[()]", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+
+	# expires at: 21/05/2017 00:00:00 EEST
+	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 ' $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."

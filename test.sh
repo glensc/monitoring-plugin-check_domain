@@ -1,6 +1,7 @@
 #!/bin/sh
 domains="
 aceonlinestore.com
+alabala.bg
 amazon.ca
 amazon.co.uk
 amazon.ie
