@@ -151,12 +151,10 @@ expiration=$(
 
 		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
-			Month[months[i]] = i;
-		}
-
-		split("jan feb mar apr may jun jul aug sep oct nov dec", months, " ");
-		for (i in months) {
-			Mon[months[i]] = i;
+			mon = months[i]
+			Month[mon] = i;
+			mon = substr(mon, 1, 3)
+			Mon[mon] = i;
 		}
 	}
 
