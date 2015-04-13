@@ -19,6 +19,7 @@ getsynced.co
 gimp.org
 google.com
 google.com.br
+google.cz
 google.sk
 greatestate.com
 isnic.is
