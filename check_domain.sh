@@ -168,17 +168,11 @@ expiration=$(
 		return Month[tolower(month)]
 	}
 
-	# Renewal date:
-	#   Monday 21st Sep 2015
-	/Renewal date:/{renewal = 1; next}
-	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-
 	# Expiry date:  05-Dec-2014
 	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
 
 	# expires:      05-Dec-2014
 	/expires:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
-
 
 	# Expiry Date: 19/11/2015
 	/Expiry Date:/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
@@ -192,12 +186,6 @@ expiration=$(
 
 	# expires:	2015-11-18
 	/expires:[ ]+/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
-	# expires:      March  5 2014
-	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
-
-	# renewal: 31-March-2016
-	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
 
 	# renewal date: 2016.01.14 18:47:31
 	/renewal date:/ && $0 ~ DATE_YYYYMMDD_HHMMSS {split($(NF-1), a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
@@ -257,6 +245,19 @@ expiration=$(
 
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
+	# FIXME: XXX: weak patterns
+
+	# renewal: 31-March-2016
+	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
+
+	# expires:      March  5 2014
+	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
+
+	# Renewal date:
+	#   Monday 21st Sep 2015
+	/Renewal date:/{renewal = 1; next}
+	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
 ' $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
