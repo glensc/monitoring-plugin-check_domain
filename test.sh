@@ -16,6 +16,7 @@ delfi.ee
 delfi.tv
 dk-hostmaster.dk
 drop.io
+educause.edu
 getsynced.co
 gimp.org
 google.com
