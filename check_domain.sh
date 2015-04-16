@@ -13,9 +13,6 @@
 # Nagios Exchange Entry: http://exchange.nagios.org/directory/Plugins/Internet-Domains-and-WHOIS/check_domain/details
 # Reporting Bugs: https://github.com/glensc/nagios-plugin-check_domain/issues/new
 
-# fail on first error, do not continue
-set -e
-
 PROGRAM=${0##*/}
 VERSION=1.4.1
 PROGPATH=${0%/*}
@@ -115,12 +112,15 @@ fi
 
 outfile=$(tempfile)
 $whois ${server:+-h $server} $domain > $outfile
+error=$?
 [ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # check for common errors
-if grep -q "Query rate limit exceeded. Reduced information." $outfile; then
+if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" $outfile; then
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
+
+[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 
 # Calculate days until expiration
 expiration=$(
