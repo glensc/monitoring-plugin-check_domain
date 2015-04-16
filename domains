@@ -3,6 +3,11 @@
 # this file is used by test.sh
 # blank lines and ones starting with '#' are ignored
 #
+# File syntax:
+#  HOSTNAME:WHOISSERVER
+#
+# WHOISSERVER is optional
+#
 # keep this file 'LC_ALL=C sort'-ed
 #
 aceonlinestore.com
