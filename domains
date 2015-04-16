@@ -1,0 +1,41 @@
+#
+# domains to test
+# this file is used by test.sh
+# blank lines and ones starting with '#' are ignored
+#
+# keep this file 'LC_ALL=C sort'-ed
+#
+aceonlinestore.com
+alabala.bg
+amazon.ca
+amazon.co.uk
+amazon.ie
+autoproff.gl
+autoproff.ir
+autoproff.pl
+autoproff.pt
+autoproff.si
+bbk.ac.uk
+cnn.com
+delfi.ee
+delfi.tv
+dk-hostmaster.dk
+drop.io
+educause.edu
+getsynced.co
+gimp.org
+google.com
+google.com.br
+google.cz
+google.sk
+greatestate.com
+isnic.is
+kyounoshikaku.jp
+mail.ru
+nic.it
+panel.li:whois.name.com
+phonedot.mobi
+sakura.ne.jp
+trashmail.im
+trashmail.se
+vbrpleugueneuc.fr
