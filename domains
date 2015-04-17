@@ -9,7 +9,7 @@
 # WHOISSERVER is optional
 #
 # keep this file 'LC_ALL=C sort'-ed
-#
+
 aceonlinestore.com
 alabala.bg
 amazon.ca
@@ -40,6 +40,7 @@ mail.ru
 nic.it
 panel.li:whois.name.com
 phonedot.mobi
+pir.org:whois.pir.org
 sakura.ne.jp
 trashmail.im
 trashmail.se
