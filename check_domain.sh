@@ -150,7 +150,9 @@ expiration=$(
 		DATE_YYYYMMDD_HHMMSS = DATE_YYYY_MM_DD_DOT " " HH_MM_DD
 		# 21/05/2017 00:00:00 EEST
 		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
-
+		# 14 Jan 2016 22:40:29 UTC
+		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
+		
 		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
 			mon = months[i]
@@ -223,7 +225,12 @@ expiration=$(
 		split($3, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
-
+	
+	# Expiry Date:             14 Jan 2016 22:40:29 UTC
+        $0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
+                printf("%s-%s-%s", $5, mon2moy($4), $3);
+        }
+        
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
 	$0 ~ "Expiry Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
