@@ -9,6 +9,7 @@
 # WHOISSERVER is optional
 #
 # keep this file 'LC_ALL=C sort'-ed
+# in vim, type: shift+V to make line based selection, type !LC_ALL=C sort
 
 aceonlinestore.com
 alabala.bg
@@ -38,6 +39,7 @@ isnic.is
 kyounoshikaku.jp
 mail.ru
 nic.it
+palantetech.coop
 panel.li:whois.name.com
 phonedot.mobi
 pir.org:whois.pir.org
