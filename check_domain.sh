@@ -277,10 +277,18 @@ nowseconds=$(date +%s)
 diffseconds=$((expseconds-nowseconds))
 expdays=$((diffseconds/86400))
 
-# Trigger alarms if applicable
-[ $expdays -lt 0 ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired on $expiration. | domain_days_until_expiry=$expdays;$warning;$critical"
-[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
-[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+# Trigger alarms if applicable in the case that both $warning and $critical are positive
+if [ $warning -ge 0 ] && [ $critical -ge 0 ]; then
+	[ $expdays -lt 0 ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired on $expiration. | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 
+	# No alarms? Ok, everything is right.
+	die "$STATE_OK" "OK - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+fi
+
+# Trigger alarms if applicable in the case that $warning and/or $critical are negative
+[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 # No alarms? Ok, everything is right.
-die "$STATE_OK" "OK - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+die "$STATE_OK" "OK - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
