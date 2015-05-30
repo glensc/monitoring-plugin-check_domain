@@ -255,6 +255,9 @@ expiration=$(
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
+	# Expiry Date: 31-03-2016
+	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
@@ -267,9 +270,6 @@ expiration=$(
 	#   Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-
-	# Expiry Date: 31-03-2016
-	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 ' $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
