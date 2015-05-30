@@ -258,6 +258,9 @@ expiration=$(
 	# Renewal Date: 2016-06-25
 	$0 ~ "Renewal Date: *" DATE_YYYY_MM_DD { print($3); exit}
 
+	# Expiry Date: 31-03-2016
+	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
