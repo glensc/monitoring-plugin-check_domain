@@ -227,11 +227,11 @@ expiration=$(
 		split($3, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
-	
-	# Expiry Date:             14 Jan 2016 22:40:29 UTC
-        $0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
-                printf("%s-%s-%s", $5, mon2moy($4), $3);
-        }
+
+	# Expiry Date: 14 Jan 2016 22:40:29 UTC
+	$0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
+		printf("%s-%s-%s", $5, mon2moy($4), $3);
+	}
 
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
@@ -245,7 +245,7 @@ expiration=$(
 
 	# Expires: 2014-01-31
 	# Expiry : 2014-03-08
-	# Valid-date          2014-10-21
+	# Valid-date 2014-10-21
 	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# [Expires on] 2014/12/01
@@ -274,11 +274,11 @@ expiration=$(
 	# renewal: 31-March-2016
 	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
 
-	# expires:      March  5 2014
+	# expires: March 5 2014
 	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
 
 	# Renewal date:
-	#   Monday 21st Sep 2015
+	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
 ' $outfile)
