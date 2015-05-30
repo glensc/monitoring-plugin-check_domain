@@ -267,6 +267,10 @@ expiration=$(
 	#   Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
+
+	# Renewal Date: 31-03-2016
+	$0 ~ "Renewal Date: *" DATE_DD_MM_YYYY { print($3); exit}
+
 ' $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
