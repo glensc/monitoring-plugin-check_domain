@@ -268,8 +268,8 @@ expiration=$(
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
 
-	# Renewal Date: 31-03-2016
-	$0 ~ "Renewal Date: *" DATE_DD_MM_YYYY { print($3); exit}
+	# Renewal Date: 2016-06-25
+	$0 ~ "Renewal Date: *" DATE_YYYY_MM_DD { print($3); exit}
 
 ' $outfile)
 
