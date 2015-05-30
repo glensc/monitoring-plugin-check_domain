@@ -141,6 +141,8 @@ expiration=$(
 		DATE_YYYY_MM_DD_SLASH = "[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]"
 		DATE_DD_MM_YYYY_SLASH = "[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]"
 		DATE_YYYY_MM_DD_NIL = "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+		# 2015-10-03 13:36:48
+		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH " " HH_MM_DD
 
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
@@ -260,6 +262,12 @@ expiration=$(
 
 	# Expiry Date: 31-03-2016
 	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
+	# Expired: 2015-10-03 13:36:48
+	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+
+	# Expiration Time: 2015-10-03 13:36:48
+	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
 	# FIXME: XXX: weak patterns
 
