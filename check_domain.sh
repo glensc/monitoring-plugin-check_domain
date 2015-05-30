@@ -257,6 +257,12 @@ expiration=$(
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
+	# Expired: 2015-10-03 13:36:48
+	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+
+	# Expiration Time: 2015-10-03 13:36:48
+	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
