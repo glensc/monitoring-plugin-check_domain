@@ -269,6 +269,10 @@ expiration=$(
 	# Expiration Time: 2015-10-03 13:36:48
 	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
+	# .fi domains
+	# expires:  4.6.2020
+	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, "."); printf("%s-%02d-%02d", a[3], a[2], a[1]); exit;}
+
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
