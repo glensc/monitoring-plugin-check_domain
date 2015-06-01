@@ -210,6 +210,9 @@ expiration=$(
 	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
 	$0 ~ "Expiration Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 
+	# domain_datebilleduntil: 2015-01-11T23:00:00-07:00Z
+	$0 ~ "billed[ ]*until: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 
