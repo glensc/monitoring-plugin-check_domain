@@ -174,6 +174,16 @@ expiration=$(
 		return Month[tolower(month)]
 	}
 
+	# get date from DATE_ISO_FULL format from `s` using field separator `fs` from index `i` and exit
+	function get_iso_date(s, fs, i,   a, d) {
+		if (split($0, a, fs)) {
+			if (split(a[i], d, /T/)) {
+				print d[1];
+				exit;
+			}
+		}
+	}
+
 	# Expiry date:  05-Dec-2014
 	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
 
@@ -208,13 +218,13 @@ expiration=$(
 	# Expiration Date: 2017-01-26T10:14:11Z
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
 	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
-	$0 ~ "Expiration Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+	$0 ~ "Expiration Date: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
 
 	# domain_datebilleduntil: 2015-01-11T23:00:00-07:00Z
-	$0 ~ "billed[ ]*until: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+	$0 ~ "billed[ ]*until: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
 
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
-	$0 ~ "Expiration Date: " DATE_ISO_LIKE {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+	$0 ~ "Expiration Date: " DATE_ISO_LIKE { get_iso_date($0, ":", 2) }
 
 	# Data de expiração / Expiration Date (dd/mm/yyyy): 18/01/2016
 	$0 ~ "Expiration Date .dd/mm/yyyy" {split($NF, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
