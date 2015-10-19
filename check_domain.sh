@@ -122,7 +122,7 @@ if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT 
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
 
-[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
+[ $error -eq 0 ] || [ $error -eq 2 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 
 # Calculate days until expiration
 expiration=$(
