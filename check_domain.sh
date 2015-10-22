@@ -122,7 +122,7 @@ if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT 
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
 if grep -q -e "fgets: Connection reset by peer" $outfile; then
-	$error = 0
+	error=0
 fi
 
 [ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
