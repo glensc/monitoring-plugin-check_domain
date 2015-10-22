@@ -114,15 +114,18 @@ else
 fi
 
 outfile=$(tempfile)
-$whois ${server:+-h $server} $domain > $outfile && error=$? || error=$?
+$whois ${server:+-h $server} $domain > $outfile 2>&1 && error=$? || error=$?
 [ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # check for common errors
 if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" $outfile; then
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
+if grep -q -e "fgets: Connection reset by peer" $outfile; then
+	$error = 0
+fi
 
-[ $error -eq 0 ] || [ $error -eq 2 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
+[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 
 # Calculate days until expiration
 expiration=$(
