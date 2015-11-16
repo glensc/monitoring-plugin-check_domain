@@ -20,7 +20,7 @@ PROGRAM=${0##*/}
 VERSION=1.4.5
 PROGPATH=${0%/*}
 # shellcheck source=/dev/null
-. $PROGPATH/utils.sh
+. "$PROGPATH/utils.sh"
 
 # Default values (days):
 critical=7
