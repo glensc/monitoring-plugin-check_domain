@@ -81,7 +81,8 @@ EOF
 # create tempfile. as secure as possible
 # tempfile name is returned to stdout
 tempfile() {
-	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}"/check_domain."$RANDOM".$$
+	random=$(awk -v min=100000 -v max=999999 'BEGIN{srand(); print int(min+rand()*(max-min+1))}')
+	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}"/check_domain."$random".$$
 }
 
 while :; do
