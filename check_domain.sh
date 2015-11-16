@@ -29,20 +29,20 @@ warning=30
 awk=${AWK:-awk}
 
 # Parse arguments
-args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n $PROGRAM -- "$@")
+args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
 if [ $? != 0 ]; then
 	echo >&2 "$PROGRAM: Could not parse arguments"
 	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
 	exit 1
 fi
-set -- $args
+set -- "$args"
 
 die() {
 	local rc=$1
 	local msg="$2"
 	echo "$msg"
 	test "$outfile" && rm -f "$outfile"
-	exit $rc
+	exit "$rc"
 }
 
 fullusage() {
@@ -81,7 +81,7 @@ EOF
 # create tempfile. as secure as possible
 # tempfile name is returned to stdout
 tempfile() {
-	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo ${TMPDIR:-/tmp}/check_domain.$RANDOM.$$
+	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}"/check_domain."$RANDOM".$$
 }
 
 while :; do
@@ -97,7 +97,7 @@ while :; do
 	esac
 done
 
-if [ -z $domain ]; then
+if [ -z "$domain" ]; then
 	die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
 fi
 
@@ -115,14 +115,14 @@ else
 fi
 
 outfile=$(tempfile)
-$whois ${server:+-h $server} $domain > $outfile 2>&1 && error=$? || error=$?
+$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
 [ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 # check for common errors
-if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" $outfile; then
+if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
-if grep -q -e "fgets: Connection reset by peer" $outfile; then
+if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
 	error=0
 fi
 
@@ -130,36 +130,36 @@ fi
 
 # Calculate days until expiration
 expiration=$(
-	$awk '
+	$awk "
 	BEGIN {
-		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
-		YYYY = "[0-9][0-9][0-9][0-9]"
-		DD = "[0-9][0-9]"
-		MON = "[A-Za-z][a-z][a-z]"
-		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9]"
-		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Za-z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
-		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
-		DATE_ISO_LIKE = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] "
-		DATE_YYYY_MM_DD_DASH = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
-		DATE_YYYY_MM_DD_DOT = "[0-9][0-9][0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]"
-		DATE_YYYY_MM_DD_SLASH = "[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]"
-		DATE_DD_MM_YYYY_SLASH = "[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]"
-		DATE_YYYY_MM_DD_NIL = "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
+		HH_MM_DD = '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
+		YYYY = '[0-9][0-9][0-9][0-9]'
+		DD = '[0-9][0-9]'
+		MON = '[A-Za-z][a-z][a-z]'
+		DATE_DD_MM_YYYY_DOT = '[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9]'
+		DATE_DD_MON_YYYY = '[0-9][0-9]-[A-Za-z][a-z][a-z]-[0-9][0-9][0-9][0-9]'
+		DATE_ISO_FULL = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T'
+		DATE_ISO_LIKE = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] '
+		DATE_YYYY_MM_DD_DASH = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+		DATE_YYYY_MM_DD_DOT = '[0-9][0-9][0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]'
+		DATE_YYYY_MM_DD_SLASH = '[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]'
+		DATE_DD_MM_YYYY_SLASH = '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'
+		DATE_YYYY_MM_DD_NIL = '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'
 		# 2015-10-03 13:36:48
-		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH " " HH_MM_DD
+		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH ' ' HH_MM_DD
 
 		# Wed Mar 02 23:59:59 GMT 2016
-		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
+		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = '[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] ' HH_MM_DD ' GMT ' YYYY
 		# 02-May-2018 16:12:25 UTC
-		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
+		DATE_DD_MON_YYYY_HHMMSS_TZ = '[0-9][0-9]-' MON '-' YYYY ' ' HH_MM_DD ' UTC'
 		# 2016.01.14 18:47:31
-		DATE_YYYYMMDD_HHMMSS = DATE_YYYY_MM_DD_DOT " " HH_MM_DD
+		DATE_YYYYMMDD_HHMMSS = DATE_YYYY_MM_DD_DOT ' ' HH_MM_DD
 		# 21/05/2017 00:00:00 EEST
-		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
+		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH ' ' HH_MM_DD ' [A-Z]+'
 		# 14 Jan 2016 22:40:29 UTC
-		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
+		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = '[0-9][0-9] ' MON ' ' YYYY ' ' HH_MM_DD ' UTC'
 
-		split("january february march april may june july august september october november december", months, " ");
+		split('january february march april may june july august september october november december', months, ' ');
 		for (i in months) {
 			mon = months[i]
 			Month[mon] = i;
@@ -178,7 +178,7 @@ expiration=$(
 		return Month[tolower(month)]
 	}
 
-	# get date from DATE_ISO_FULL format from `s` using field separator `fs` from index `i` and exit
+	# get date from DATE_ISO_FULL format from 's' using field separator 'fs' from index 'i' and exit
 	function get_iso_date(s, fs, i,   a, d) {
 		if (split($0, a, fs)) {
 			if (split(a[i], d, /T/)) {
@@ -189,32 +189,32 @@ expiration=$(
 	}
 
 	# Expiry date:  05-Dec-2014
-	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
+	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, '-'); printf('%s-%s-%s\n', a[3], mon2moy(a[2]), a[1]); exit}
 
 	# expires:      05-Dec-2014
-	/expires:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
+	/expires:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, '-'); printf('%s-%s-%s\n', a[3], mon2moy(a[2]), a[1]); exit}
 
 	# Expiry Date: 19/11/2015
-	/Expiry Date:/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	/Expiry Date:/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($3, a, '/'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# Expire Date:  2015-10-22
 	# expire-date:	2016-02-05
 	/[Ee]xpire[- ][Dd]ate:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# expires: 20170716
-	/expires:/ && $NF ~ DATE_YYYY_MM_DD_NIL  {printf("%s-%s-%s", substr($2,0,4), substr($2,5,2), substr($2,7,2)); exit}
+	/expires:/ && $NF ~ DATE_YYYY_MM_DD_NIL  {printf('%s-%s-%s', substr($2,0,4), substr($2,5,2), substr($2,7,2)); exit}
 
 	# expires:	2015-11-18
 	/expires:[ ]+/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# renewal date: 2016.01.14 18:47:31
-	/renewal date:/ && $0 ~ DATE_YYYYMMDD_HHMMSS {split($(NF-1), a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/renewal date:/ && $0 ~ DATE_YYYYMMDD_HHMMSS {split($(NF-1), a, '.'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# paid-till: 2013.11.01
-	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DOT {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DOT {split($2, a, '.'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# expire: 16.11.2013
-	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, '.'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# expire: 2016-01-19
 	/expire:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
@@ -222,43 +222,43 @@ expiration=$(
 	# Expiration Date: 2017-01-26T10:14:11Z
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
 	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
-	$0 ~ "Expiration Date: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
+	$0 ~ 'Expiration Date: ' DATE_ISO_FULL { get_iso_date($0, ':', 2) }
 
 	# domain_datebilleduntil: 2015-01-11T23:00:00-07:00Z
-	$0 ~ "billed[ ]*until: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
+	$0 ~ 'billed[ ]*until: ' DATE_ISO_FULL { get_iso_date($0, ':', 2) }
 
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
-	$0 ~ "Expiration Date: " DATE_ISO_LIKE { get_iso_date($0, ":", 2) }
+	$0 ~ 'Expiration Date: ' DATE_ISO_LIKE { get_iso_date($0, ':', 2) }
 
 	# Data de expiração / Expiration Date (dd/mm/yyyy): 18/01/2016
-	$0 ~ "Expiration Date .dd/mm/yyyy" {split($NF, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	$0 ~ 'Expiration Date .dd/mm/yyyy' {split($NF, a, '/'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
-	$0 ~ "Expiration Date: *" DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
-		printf("%s-%s-%s", $9, mon2moy($5), $6);
+	$0 ~ 'Expiration Date: *' DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
+		printf('%s-%s-%s', $9, mon2moy($5), $6);
 	}
 
 	# Expiration Date:02-May-2018 16:12:25 UTC
-	$0 ~ "Expiration Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ {
-		sub(/Date:/, "Date: ")
-		split($3, a, "-");
-		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
+	$0 ~ 'Expiration Date: *' DATE_DD_MON_YYYY_HHMMSS_TZ {
+		sub(/Date:/, 'Date: ')
+		split($3, a, '-');
+		printf('%s-%s-%s', a[3], mon2moy(a[2]), a[1]);
 	}
 
 	# Expiry Date: 14 Jan 2016 22:40:29 UTC
-	$0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
-		printf("%s-%s-%s", $5, mon2moy($4), $3);
+	$0 ~ 'Expiry Date: *' DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
+		printf('%s-%s-%s', $5, mon2moy($4), $3);
 	}
 
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
-	$0 ~ "Expiry Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+	$0 ~ 'Expiry Date: ' DATE_ISO_FULL {split($0, a, ':'); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 
 	# Expiry date: 2017/07/16
-	/Expiry date:/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/Expiry date:/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, '/'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# Expiry Date: 19/11/2015 00:59:58
-	/Expiry Date:/ && $(NF-1) ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	/Expiry Date:/ && $(NF-1) ~ DATE_DD_MM_YYYY_SLASH {split($3, a, '/'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# Expires: 2014-01-31
 	# Expiry : 2014-03-08
@@ -266,43 +266,43 @@ expiration=$(
 	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# [Expires on] 2014/12/01
-	/\[Expires on\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/\[Expires on\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, '/'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# [State] Connected (2014/12/01)
-	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("[()]", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub('[()]', '', $3); split($3, a, '/'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# expires at: 21/05/2017 00:00:00 EEST
-	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	$0 ~ 'expires at: *' DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, '/'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# Renewal Date: 2016-06-25
-	$0 ~ "Renewal Date: *" DATE_YYYY_MM_DD { print($3); exit}
+	$0 ~ 'Renewal Date: *' DATE_YYYY_MM_DD { print($3); exit}
 
 	# Expiry Date: 31-03-2016
-	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	$0 ~ 'Expiry Date: *' DATE_DD_MM_YYYY {split($3, a, '-'); printf('%s-%s-%s', a[3], a[2], a[1]); exit}
 
 	# Expired: 2015-10-03 13:36:48
-	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	$0 ~ 'Expired: *' DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, '-'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# Expiration Time: 2015-10-03 13:36:48
-	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
+	$0 ~ 'Expiration Time: *' DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, '-'); printf('%s-%s-%s', a[1], a[2], a[3]); exit}
 
 	# .fi domains
 	# expires:  4.6.2020
-	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, "."); printf("%s-%02d-%02d", a[3], a[2], a[1]); exit;}
+	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, '.'); printf('%s-%02d-%02d', a[3], a[2], a[1]); exit;}
 
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
-	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
+	/renewal:/{split($2, a, '-'); printf('%s-%s-%s\n', a[3], month2moy(a[2]), a[1]); exit}
 
 	# expires: March 5 2014
-	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
+	/expires:/{printf('%s-%s-%s\n', $4, month2moy($2), $3); exit}
 
 	# Renewal date:
 	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
-	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-' $outfile)
+	{if (renewal) { sub(/[^0-9]+/, '', $2); printf('%s-%s-%s', $4, mon2moy($3), $2); exit}}
+" "$outfile")
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
@@ -314,15 +314,15 @@ expdays=$((diffseconds/86400))
 
 # Trigger alarms (if applicable) if the domain is not expired.
 if [ $expdays -ge 0 ]; then
-	[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
-	[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt "$critical" ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt "$warning" ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 
 	# No alarms? Ok, everything is right.
 	die "$STATE_OK" "OK - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 fi
 
 # Trigger alarms if applicable in the case that $warning and/or $critical are negative
-[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
-[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+[ $expdays -lt "$critical" ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+[ $expdays -lt "$warning" ] && die "$STATE_WARNING" "WARNING - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 # No alarms? Ok, everything is right.
 die "$STATE_OK" "OK - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
