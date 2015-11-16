@@ -117,6 +117,10 @@ outfile=$(tempfile)
 $whois ${server:+-h $server} $domain > $outfile 2>&1 && error=$? || error=$?
 [ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
+if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
+	die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
+fi
+
 # check for common errors
 if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" $outfile; then
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
