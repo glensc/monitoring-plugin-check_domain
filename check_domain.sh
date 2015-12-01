@@ -81,8 +81,7 @@ EOF
 # create tempfile. as secure as possible
 # tempfile name is returned to stdout
 tempfile() {
-	random=$(awk -v min=100000 -v max=999999 'BEGIN{srand(); print int(min+rand()*(max-min+1))}')
-	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}"/check_domain."$random".$$
+	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo ${TMPDIR:-/tmp}/check_domain.$RANDOM.$$
 }
 
 while :; do
@@ -111,7 +110,7 @@ if [ -n "$whoispath" ]; then
 	fi
 	[ -n "$whois" ] || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
 else
-	echo whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
+	type whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
 	whois=whois
 fi
 
