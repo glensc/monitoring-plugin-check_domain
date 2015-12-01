@@ -38,8 +38,8 @@ fi
 set -- $args
 
 die() {
-	rc="$1"
-	msg="$2"
+	local rc="$1"
+	local msg="$2"
 	echo "$msg"
 	test "$outfile" && rm -f "$outfile"
 	exit "$rc"
