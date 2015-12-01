@@ -19,7 +19,8 @@ set -e
 PROGRAM=${0##*/}
 VERSION=1.4.5
 PROGPATH=${0%/*}
-. $PROGPATH/utils.sh
+# shellcheck source=/dev/null
+. "$PROGPATH/utils.sh"
 
 # Default values (days):
 critical=7
@@ -28,7 +29,7 @@ warning=30
 awk=${AWK:-awk}
 
 # Parse arguments
-args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n $PROGRAM -- "$@")
+args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
 if [ $? != 0 ]; then
 	echo >&2 "$PROGRAM: Could not parse arguments"
 	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
@@ -37,11 +38,11 @@ fi
 set -- $args
 
 die() {
-	local rc=$1
+	local rc="$1"
 	local msg="$2"
 	echo "$msg"
 	test "$outfile" && rm -f "$outfile"
-	exit $rc
+	exit "$rc"
 }
 
 fullusage() {
@@ -96,7 +97,7 @@ while :; do
 	esac
 done
 
-if [ -z $domain ]; then
+if [ -z "$domain" ]; then
 	die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
 fi
 
@@ -114,7 +115,7 @@ else
 fi
 
 outfile=$(tempfile)
-$whois ${server:+-h $server} $domain > $outfile 2>&1 && error=$? || error=$?
+$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
 [ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
 if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
@@ -122,10 +123,10 @@ if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
 fi
 
 # check for common errors
-if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" $outfile; then
+if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
 	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
 fi
-if grep -q -e "fgets: Connection reset by peer" $outfile; then
+if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
 	error=0
 fi
 
@@ -305,7 +306,7 @@ expiration=$(
 	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-' $outfile)
+' "$outfile")
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
@@ -317,15 +318,15 @@ expdays=$((diffseconds/86400))
 
 # Trigger alarms (if applicable) if the domain is not expired.
 if [ $expdays -ge 0 ]; then
-	[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
-	[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt "$critical" ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+	[ $expdays -lt "$warning" ] && die "$STATE_WARNING" "WARNING - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 
 	# No alarms? Ok, everything is right.
 	die "$STATE_OK" "OK - Domain $domain will expire in $expdays days ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 fi
 
 # Trigger alarms if applicable in the case that $warning and/or $critical are negative
-[ $expdays -lt $critical ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
-[ $expdays -lt $warning ] && die "$STATE_WARNING" "WARNING - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+[ $expdays -lt "$critical" ] && die "$STATE_CRITICAL" "CRITICAL - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
+[ $expdays -lt "$warning" ] && die "$STATE_WARNING" "WARNING - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
 # No alarms? Ok, everything is right.
 die "$STATE_OK" "OK - Domain $domain expired ${expdays#-} days ago ($expdate). | domain_days_until_expiry=$expdays;$warning;$critical"
