@@ -1,35 +1,9 @@
 #!/bin/sh
-domains="
-aceonlinestore.com
-amazon.ca
-amazon.co.uk
-amazon.ie
-bbk.ac.uk
-cnn.com
-delfi.ee
-delfi.tv
-dk-hostmaster.dk
-drop.io
-getsynced.co
-gimp.org
-google.com
-google.sk
-greatestate.com
-isnic.is
-kyounoshikaku.jp
-mail.ru
-nic.it
-panel.li:whois.name.com
-phonedot.mobi
-sakura.ne.jp
-trashmail.im
-trashmail.se
-google.com.br
-"
-
-whois=$(pwd)/whois.sh
+dir=$(dirname "$0")
+whois=$dir/whois.sh
 sh=${SH:-/bin/sh}
-for domain in ${*:-$domains}; do
+
+for domain in ${*:-$(grep -Ev '^#' "$dir/domains")}; do
 	server=${domain##*:}
 	domain=${domain%%:*}
 	server=${server#$domain}

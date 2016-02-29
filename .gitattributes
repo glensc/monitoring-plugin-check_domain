@@ -1,0 +1,12 @@
+# general excludes
+/.gitignore export-ignore
+/.gitattributes export-ignore
+
+# maintenance tools
+/.travis.yml export-ignore
+
+# tests
+/test.sh export-ignore
+/utils.sh export-ignore
+/whois.sh export-ignore
+/domains export-ignore
