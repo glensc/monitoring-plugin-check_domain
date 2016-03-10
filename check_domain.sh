@@ -2,7 +2,7 @@
 # Nagios plugin for checking a domain name expiration date
 #
 # Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com> (Original Author),
-# Copyright (c) 2009-2015 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
+# Copyright (c) 2009-2016 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
 #
 # Licensed under GPL v2 License
 # URL: https://github.com/glensc/nagios-plugin-check_domain
@@ -29,7 +29,7 @@ warning=30
 awk=${AWK:-awk}
 
 # Parse arguments
-args=$(getopt -o hd:w:c:P:s: --long help,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
+args=$(getopt -o hVd:w:c:P:s: --long help,version,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
 if [ $? != 0 ]; then
 	echo >&2 "$PROGRAM: Could not parse arguments"
 	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
@@ -45,11 +45,15 @@ die() {
 	exit "$rc"
 }
 
+version() {
+	echo "check_domain - v$VERSION"
+}
+
 fullusage() {
 	cat <<EOF
 check_domain - v$VERSION
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com> (Original Author),
-Copyright (c) 2009-2015 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
+Copyright (c) 2009-2016 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
 Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
@@ -60,6 +64,8 @@ NOTE: -d must be specified
 Options:
 -h, --help
      Print detailed help
+-V, --version
+     Print version information
 -d, --domain
      Domain name to check
 -w, --warning
@@ -91,6 +97,7 @@ while :; do
 		-d|--domain)   domain=$2; shift 2;;
 		-P|--path)     whoispath=$2; shift 2;;
 		-s|--server)   server=$2; shift 2;;
+		-V|--version)  version; exit;;
 		-h|--help)     fullusage; exit;;
 		--) shift; break;;
 		*) die "$STATE_UNKNOWN" "Internal error!";;
