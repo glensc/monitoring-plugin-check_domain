@@ -251,8 +251,8 @@ expiration=$(
 
 	# Expiration Date:02-May-2018 16:12:25 UTC
 	$0 ~ "Expiration Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ {
-		sub(/Date:/, "Date: ")
-		split($3, a, "-");
+		sub(/^.*Expiration Date: */, "")
+		split($1, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
 
