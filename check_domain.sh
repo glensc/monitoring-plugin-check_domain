@@ -17,7 +17,7 @@
 set -e
 
 PROGRAM=${0##*/}
-VERSION=1.4.5
+VERSION=1.4.6
 PROGPATH=${0%/*}
 # shellcheck source=/dev/null
 . "$PROGPATH/utils.sh"
