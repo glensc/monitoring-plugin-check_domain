@@ -105,6 +105,28 @@ setup_whois() {
 	fi
 }
 
+# Run whois(1)
+run_whois() {
+	local error
+
+	$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
+	[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
+
+	if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
+		die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
+	fi
+
+	# check for common errors
+	if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
+		die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
+	fi
+	if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
+		error=0
+	fi
+
+	[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
+}
+
 while :; do
 	case "$1" in
 		-c|--critical) critical=$2; shift 2;;
@@ -126,22 +148,7 @@ fi
 setup_whois
 
 outfile=$(tempfile)
-$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
-[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
-
-if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
-	die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
-fi
-
-# check for common errors
-if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
-	die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
-fi
-if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
-	error=0
-fi
-
-[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
+run_whois
 
 # Calculate days until expiration
 expiration=$(
