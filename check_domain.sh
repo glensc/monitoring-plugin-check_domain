@@ -191,7 +191,7 @@ expiration=$(
 
 	# get date from DATE_ISO_FULL format from `s` using field separator `fs` from index `i` and exit
 	function get_iso_date(s, fs, i,   a, d) {
-		if (split($0, a, fs)) {
+		if (split(s, a, fs)) {
 			if (split(a[i], d, /T/)) {
 				print d[1];
 				exit;
