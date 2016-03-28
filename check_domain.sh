@@ -19,7 +19,7 @@ set -e
 PROGRAM=${0##*/}
 VERSION=1.4.6
 PROGPATH=${0%/*}
-CACHE_DIR='/var/log/nagios/domain-cache'
+CACHE_DIR='/var/cache/nagios/domain-cache'
 
 # shellcheck source=/dev/null
 . "$PROGPATH/utils.sh"
@@ -44,7 +44,7 @@ die() {
 	local rc="$1"
 	local msg="$2"
 	echo "$msg"
-	if [ "$rc" != 0 ] || [ "$cachefor" == 0 ]; then
+	if [ "$rc" != 0 ] || [ "$cachefor" = 0 ]; then
 		test -f "$outfile" && rm -f "$outfile"
 	else
 		# Clean up cache file if it's older than cachefor days
@@ -326,8 +326,7 @@ expiration=$(
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
 ' "$outfile")
 
-# Fail if date is empty OR invalid
-test -n "$expiration" && date -d "$expiration" 2>/dev/null 1>&2 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
+[ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
 expseconds=$(date +%s --date="$expiration")
 expdate=$(date +'%Y-%m-%d' --date="$expiration")
