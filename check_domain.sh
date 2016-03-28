@@ -90,6 +90,21 @@ tempfile() {
 	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo ${TMPDIR:-/tmp}/check_domain.$RANDOM.$$
 }
 
+# Looking for whois binary
+setup_whois() {
+	if [ -n "$whoispath" ]; then
+		if [ -x "$whoispath" ]; then
+			whois=$whoispath
+		elif [ -x "$whoispath/whois" ]; then
+			whois=$whoispath/whois
+		fi
+		[ -n "$whois" ] || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
+	else
+		type whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
+		whois=whois
+	fi
+}
+
 while :; do
 	case "$1" in
 		-c|--critical) critical=$2; shift 2;;
@@ -108,18 +123,7 @@ if [ -z "$domain" ]; then
 	die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
 fi
 
-# Looking for whois binary
-if [ -n "$whoispath" ]; then
-	if [ -x "$whoispath" ]; then
-		whois=$whoispath
-	elif [ -x "$whoispath/whois" ]; then
-		whois=$whoispath/whois
-	fi
-	[ -n "$whois" ] || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
-else
-	type whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
-	whois=whois
-fi
+setup_whois
 
 outfile=$(tempfile)
 $whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
