@@ -85,11 +85,6 @@ set_defaults() {
 parse_arguments() {
 	local args
 	args=$(getopt -o hVd:w:c:P:s: --long help,version,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
-	if [ $? != 0 ]; then
-		echo >&2 "$PROGRAM: Could not parse arguments"
-		usage
-		exit 1
-	fi
 	eval set -- "$args"
 
 	while :; do
