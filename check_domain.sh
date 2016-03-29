@@ -178,14 +178,10 @@ run_whois() {
 	[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 }
 
-set_defaults
-parse_arguments "$@"
+# Calculate days until expiration from whois output
+get_expiration() {
+	local outfile=$1
 
-outfile=$(tempfile)
-run_whois
-
-# Calculate days until expiration
-expiration=$(
 	$awk '
 	BEGIN {
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
@@ -358,7 +354,15 @@ expiration=$(
 	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-' "$outfile")
+	' "$outfile"
+}
+
+set_defaults
+parse_arguments "$@"
+
+outfile=$(tempfile)
+run_whois
+expiration=$(get_expiration $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
