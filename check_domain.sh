@@ -17,25 +17,10 @@
 set -e
 
 PROGRAM=${0##*/}
-VERSION=1.4.6
+VERSION=1.5.0
 PROGPATH=${0%/*}
 # shellcheck source=/dev/null
 . "$PROGPATH/utils.sh"
-
-# Default values (days):
-critical=7
-warning=30
-
-awk=${AWK:-awk}
-
-# Parse arguments
-args=$(getopt -o hVd:w:c:P:s: --long help,version,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
-if [ $? != 0 ]; then
-	echo >&2 "$PROGRAM: Could not parse arguments"
-	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
-	exit 1
-fi
-set -- $args
 
 die() {
 	local rc="$1"
@@ -47,6 +32,10 @@ die() {
 
 version() {
 	echo "check_domain - v$VERSION"
+}
+
+usage() {
+	echo "Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]"
 }
 
 fullusage() {
@@ -84,6 +73,71 @@ Example:
 EOF
 }
 
+set_defaults() {
+	# Default values (days):
+	critical=7
+	warning=30
+
+	awk=${AWK:-awk}
+}
+
+# Parse command line arguments
+parse_arguments() {
+	local args
+	args=$(getopt -o hVd:w:c:P:s: --long help,version,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
+	if [ $? != 0 ]; then
+		echo >&2 "$PROGRAM: Could not parse arguments"
+		usage
+		exit 1
+	fi
+	eval set -- "$args"
+
+	while :; do
+		case "$1" in
+		-c|--critical)
+			shift
+			critical=$1
+		;;
+		-w|--warning)
+			shift
+			warning=$1
+		;;
+		-d|--domain)
+			shift
+			domain=$1
+		;;
+		-P|--path)
+			shift
+			whoispath=$1
+		;;
+		-s|--server)
+			shift
+			server=$1
+			;;
+		-V|--version)
+			version
+			exit
+		;;
+		-h|--help)
+			fullusage
+			exit
+		;;
+		--)
+			shift
+			break
+		;;
+		*)
+			die "$STATE_UNKNOWN" "Internal error!"
+		;;
+		esac
+		shift
+	done
+
+	if [ -z "$domain" ]; then
+		die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
+	fi
+}
+
 # create tempfile. as secure as possible
 # tempfile name is returned to stdout
 tempfile() {
@@ -109,6 +163,8 @@ setup_whois() {
 run_whois() {
 	local error
 
+	setup_whois
+
 	$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
 	[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
@@ -127,25 +183,8 @@ run_whois() {
 	[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 }
 
-while :; do
-	case "$1" in
-		-c|--critical) critical=$2; shift 2;;
-		-w|--warning)  warning=$2; shift 2;;
-		-d|--domain)   domain=$2; shift 2;;
-		-P|--path)     whoispath=$2; shift 2;;
-		-s|--server)   server=$2; shift 2;;
-		-V|--version)  version; exit;;
-		-h|--help)     fullusage; exit;;
-		--) shift; break;;
-		*) die "$STATE_UNKNOWN" "Internal error!";;
-	esac
-done
-
-if [ -z "$domain" ]; then
-	die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
-fi
-
-setup_whois
+set_defaults
+parse_arguments "$@"
 
 outfile=$(tempfile)
 run_whois
