@@ -16,9 +16,10 @@ OK - Domain github.io will expire in 43 days (2014-03-08).
 1. Fork it.
 2. Create your feature branch (`git checkout -b fixing-blah`).
 3. Commit your changes (`git commit -am 'Fixed blah'`).
-4. Run `./test.sh`, add new domain to check
-5. Push to the branch (`git push origin fixing-blah`).
-6. Create a new pull request.
+4. Run `./test.sh domain.tld` to test the domain
+5. Add the example domain name to [domains](domains) for CI to test them, commit it
+6. Push to the branch (`git push origin fixing-blah`).
+7. Create a new pull request.
 
 Do not update changelog or attempt to change version.
 
