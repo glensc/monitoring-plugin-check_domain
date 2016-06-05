@@ -26,7 +26,8 @@ die() {
 	local rc="$1"
 	local msg="$2"
 	echo "$msg"
-	test "$outfile" && rm -f "$outfile"
+	# remove outfile if not caching
+	[ -z "$cache_dir" ] && rm -f "$outfile"
 	exit "$rc"
 }
 
@@ -402,8 +403,19 @@ get_expiration() {
 set_defaults
 parse_arguments "$@"
 
-outfile=$(tempfile)
-run_whois
+if [ -n "$cache_dir" ]; then
+	# we might consider whois server name in cache file
+	outfile=$cache_dir/$domain
+
+	# clean up cache file if it's outdated
+	test -f "$outfile" && find "$outfile" -mtime +$cache_age -delete
+
+	# run whois if cache is empty or missing
+	test -s "$outfile" || run_whois
+else
+	outfile=$(tempfile)
+	run_whois
+fi
 expiration=$(get_expiration $outfile)
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
