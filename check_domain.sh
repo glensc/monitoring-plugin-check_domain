@@ -30,6 +30,17 @@ die() {
 	exit "$rc"
 }
 
+# return true if argument is numeric
+# http://stackoverflow.com/a/3951175/2314626
+is_numeric() {
+	case "$1" in
+	''|*[!0-9]*)
+		return 1
+		;;
+	esac
+	return 0
+}
+
 version() {
 	echo "check_domain - v$VERSION"
 }
@@ -65,6 +76,10 @@ Options:
      Path to whois binary
 -s, --server
      Specific Whois server for domain name check
+-a, --cache-age
+     How many days should each WHOIS lookup be cached for (default 0). Requires cache dir.
+-C, --cache-dir
+     Directory where to cache lookups
 
 This plugin will use whois service to get the expiration date for the domain name.
 Example:
@@ -78,13 +93,16 @@ set_defaults() {
 	critical=7
 	warning=30
 
+	cache_age=0
+	cache_dir=
+
 	awk=${AWK:-awk}
 }
 
 # Parse command line arguments
 parse_arguments() {
 	local args
-	args=$(getopt -o hVd:w:c:P:s: --long help,version,domain:,warning:,critical:,path:,server: -u -n "$PROGRAM" -- "$@")
+	args=$(getopt -o hVd:w:c:P:s:a:C: --long help,version,domain:,warning:,critical:,path:,server:,cache-age:,cache-dir: -u -n "$PROGRAM" -- "$@")
 	eval set -- "$args"
 
 	while :; do
@@ -108,10 +126,18 @@ parse_arguments() {
 		-s|--server)
 			shift
 			server=$1
-			;;
+		;;
 		-V|--version)
 			version
 			exit
+		;;
+		-a|--cache-age)
+			shift
+			cache_age=$1
+		;;
+		-C|--cache-dir)
+			shift
+			cache_dir=$1
 		;;
 		-h|--help)
 			fullusage
@@ -130,6 +156,17 @@ parse_arguments() {
 
 	if [ -z "$domain" ]; then
 		die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
+	fi
+
+	# validate cache args
+	if [ -n "$cache_dir" ] && [ ! -d "$cache_dir" ]; then
+		die "$STATE_UNKNOWN" "Cache dir: '$cache_dir' does not exist"
+	fi
+	if [ -n "$cache_age" ] && ! is_numeric "$cache_age"; then
+		die "$STATE_UNKNOWN" "Cache age is not numeric: '$cache_age'"
+	fi
+	if [ -n "$cache_dir" ] && [ $cache_age -le 0 ]; then
+		die "$STATE_UNKNOWN" "Cache dir set, but age not"
 	fi
 }
 
