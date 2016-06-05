@@ -26,8 +26,15 @@ die() {
 	local rc="$1"
 	local msg="$2"
 	echo "$msg"
-	# remove outfile if not caching
-	[ -z "$cache_dir" ] && rm -f "$outfile"
+
+	if [ "$rc" = 0 ]; then
+		# remove outfile if not caching
+		[ -z "$cache_dir" ] && rm -f "$outfile"
+	else
+		# always remove output even if caching to force re-check in case on errors
+		rm -f "$outfile"
+	fi
+
 	exit "$rc"
 }
 
