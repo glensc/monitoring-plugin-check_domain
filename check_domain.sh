@@ -251,8 +251,8 @@ get_expiration() {
 	# Expiry Date: 19/11/2015
 	/Expiry Date:/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
-        # Expiration date: 16.11.2013 15:30:13
-        /Expiration date:/ && $0 ~ DATE_DD_MM_YYYY_DOT_HH_MM_SS {split($(NF-1), a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	# Expiration date: 16.11.2013 15:30:13
+	/Expiration date:/ && $0 ~ DATE_DD_MM_YYYY_DOT_HH_MM_SS {split($(NF-1), a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
 	# Expire Date:  2015-10-22
 	# expire-date:	2016-02-05
