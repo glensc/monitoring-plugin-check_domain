@@ -5,11 +5,21 @@ Nagios/Icinga Plugin: check\_domain
 
 Nagios/Icinga plugin for checking a domain name expiration date
 
-Usage:
+### Usage
+
 ```
 $ ./check_domain.sh -d github.io
 OK - Domain github.io will expire in 43 days (2014-03-08).
 ```
+
+### Caching
+
+This tool excels at monitoring a small number of domains, but because of whois rate limiting, it becomes infeasible to use for a large number of domains. For this to work around, there's support for caching positive lookups for defined time period. A failed lookup will cause the domain cache file to be removed so it should be as responsive as a normal check when the critical/warning threshold is reached.
+
+An example to configure to cache positive lookups for one day:
+  * `--cache-dir /var/cache/check_domain --cache-age 1`
+
+The cache dir must exist and must be writable for user running the checks.
 
 ## Pull requests
 
