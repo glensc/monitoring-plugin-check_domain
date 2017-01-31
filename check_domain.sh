@@ -246,7 +246,8 @@ get_expiration() {
 		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH " " HH_MM_DD
 		# 15.05.2016 13:36:48
 		DATE_DD_MM_YYYY_DOT_HH_MM_SS = DATE_DD_MM_YYYY_DOT " " HH_MM_DD
-
+		# 03 Apr 2017
+                DATE_DD_MON_YYYY_SPACE = "[0-9][0-9] " MON " " YYYY
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
 		# 02-May-2018 16:12:25 UTC
@@ -399,6 +400,14 @@ get_expiration() {
 
 	# expires: March 5 2014
 	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
+
+	# Expires: 03 Apr 2017
+        $0 ~ "Expires: *" DATE_DD_MON_YYYY_SPACE {
+                printf("%s-%s-%s", $4, mon2moy($3), $2);
+        }
+	
+	# Fecha de Vencimiento: 2017-04-04 19:14:09
+        $0 ~ "Fecha de Vencimiento: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($4, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
 	# Renewal date:
 	# Monday 21st Sep 2015
