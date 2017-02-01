@@ -310,6 +310,7 @@ get_expiration() {
 	# expire-date:	2016-02-05
 	/[Ee]xpire[- ][Dd]ate:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
+	# 2016-02-05
 	$NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# expires: 20170716
