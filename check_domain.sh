@@ -126,6 +126,7 @@ parse_arguments() {
 		-d|--domain)
 			shift
 			domain=$1
+			last=$(echo $domain | rev | cut -d "." -f1 | rev)
 		;;
 		-P|--path)
 			shift
@@ -161,7 +162,6 @@ parse_arguments() {
 		esac
 		shift
 	done
-
 	if [ -z "$domain" ]; then
 		die "$STATE_UNKNOWN" "UNKNOWN - There is no domain name to check"
 	fi
@@ -204,23 +204,28 @@ run_whois() {
 	local error
 
 	setup_whois
+	if [ $last = "pa" ]
+	then
+		curl -s "http://www.nic.pa/whois.php?nombre_d=$domain" 2>&1 | grep -A 1 "Fecha de Renova" | tail -n 1 |  grep -Eo '[[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}' > "$outfile" 2>&1 && error=$? || error=$?
+	
+	else
+		$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
+		[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
-	$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
-	[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
+		if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
+			die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
+		fi
 
-	if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
-		die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
+		# check for common errors
+		if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
+			die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
+		fi
+		if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
+			error=0
+		fi
+
+		[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 	fi
-
-	# check for common errors
-	if grep -q -e "Query rate limit exceeded. Reduced information." -e "WHOIS LIMIT EXCEEDED" "$outfile"; then
-		die "$STATE_UNKNOWN" "UNKNOWN - Rate limited WHOIS response"
-	fi
-	if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
-		error=0
-	fi
-
-	[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 }
 
 # Calculate days until expiration from whois output
@@ -304,6 +309,8 @@ get_expiration() {
 	# Expire Date:  2015-10-22
 	# expire-date:	2016-02-05
 	/[Ee]xpire[- ][Dd]ate:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+
+	$NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
 	# expires: 20170716
 	/expires:/ && $NF ~ DATE_YYYY_MM_DD_NIL  {printf("%s-%s-%s", substr($2,0,4), substr($2,5,2), substr($2,7,2)); exit}
