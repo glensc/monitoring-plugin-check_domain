@@ -258,8 +258,6 @@ get_expiration() {
 		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
 		# 14 Jan 2016 22:40:29 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
-		# 2017-05-03 12:46:02 CLT
-		DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZ = DATE_YYYY_MM_DD_DASH_HH_MM_SS " CLT"
 		
 
 		split("january february march april may june july august september october november december", months, " ");
@@ -414,9 +412,6 @@ get_expiration() {
 
 	#Fecha de expiración (Expiration date): 2017-05-03 12:46:02 CLT
 	$0 ~ ".Expiration date" {split($6, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
-	# Data de expiração / Expiration Date (dd/mm/yyyy): 18/01/2016
-        #$0 ~ "Expiration Date .dd/mm/yyyy" {split($NF, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
 	# Renewal date:
 	# Monday 21st Sep 2015
