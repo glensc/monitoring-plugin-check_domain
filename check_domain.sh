@@ -404,6 +404,9 @@ get_expiration() {
 	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
+
+	# paid-till:     2017-12-10T12:42:36Z
+	/paid-till:/ && $NF ~ DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 	' "$outfile"
 }
 
