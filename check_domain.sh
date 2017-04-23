@@ -258,6 +258,8 @@ get_expiration() {
 		# 14 Jan 2016 22:40:29 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
 
+		# 2007-02-28 11:48:53+02
+		DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET = DATE_YYYY_MM_DD_DASH " " HH_MM_DD "\\+[0-9]+"
 		split("january february march april may june july august september october november december", months, " ");
 		for (i in months) {
 			mon = months[i]
@@ -395,6 +397,9 @@ get_expiration() {
 	# expires:  4.6.2020
 	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, "."); printf("%s-%02d-%02d", a[3], a[2], a[1]); exit;}
 
+	# .ua domain
+	# Expiration Time: 2007-02-28 11:48:53+02
+	$0 ~ "expires: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 	# FIXME: XXX: weak patterns
 
 	# renewal: 31-March-2016
