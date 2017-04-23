@@ -398,7 +398,7 @@ get_expiration() {
 	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, "."); printf("%s-%02d-%02d", a[3], a[2], a[1]); exit;}
 
 	# .ua domain
-	# Expiration Time: 2007-02-28 11:48:53+02
+	# expires: 2017-09-01 17:09:32+03
 	$0 ~ "expires: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 	# FIXME: XXX: weak patterns
 
