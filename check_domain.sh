@@ -249,6 +249,8 @@ get_expiration() {
 
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
+		# 25-Apr-2018 16:00:50
+		DATE_DD_MON_YYYY_HHMMSS = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD
 		# 02-May-2018 16:12:25 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ = "[0-9][0-9]-" MON "-" YYYY " " HH_MM_DD " UTC"
 		# 2016.01.14 18:47:31
@@ -348,6 +350,15 @@ get_expiration() {
 	# Expiration Date:02-May-2018 16:12:25 UTC
 	$0 ~ "Expiration Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ {
 		sub(/^.*Expiration Date: */, "")
+		split($1, a, "-");
+		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
+	}
+
+	# .sg domains
+	# Expiration Date:		25-Apr-2018 16:00:50
+	# (uses tabs between colon and date, we match tabs or spaces regardless)
+	$0 ~ "Expiration Date:[ \t]*" DATE_DD_MON_YYYY_HHMMSS {
+		sub(/^.*Expiration Date:[ \t]*/, "")
 		split($1, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
