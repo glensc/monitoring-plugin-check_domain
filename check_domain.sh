@@ -18,9 +18,11 @@ set -e
 
 PROGRAM=${0##*/}
 VERSION=1.5.0
-PROGPATH=${0%/*}
-# shellcheck source=/dev/null
-. "$PROGPATH/utils.sh"
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
 
 die() {
 	local rc="$1"
