@@ -19,8 +19,21 @@ set -e
 PROGRAM=${0##*/}
 VERSION=1.5.0
 PROGPATH=${0%/*}
+
+# try to source ./utils.sh first and if that doesn't exist try
+#	/usr/lib/nagios/plugins/utils.sh
+if [ -x "$PROGPATH/utils.sh" ];
+then
+	UTILSPATH="$PROGPATH/utils.sh"
+elif [ -x /usr/lib/nagios/plugins/utils.sh ];
+then
+	UTILSPATH="/usr/lib/nagios/plugins/utils.sh"
+else
+	die 3 "Can't source utils.sh"
+fi
+
 # shellcheck source=/dev/null
-. "$PROGPATH/utils.sh"
+. "$UTILSPATH"
 
 die() {
 	local rc="$1"
