@@ -405,8 +405,13 @@ get_expiration() {
 	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
 	# .fi domains
-	# expires:  4.6.2020
-	/expires:[ ]+[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}/ { split($2, a, "."); printf("%s-%02d-%02d", a[3], a[2], a[1]); exit;}
+	# expires............: 4.7.2017
+	/^expires\.*: +[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9][0-9][0-9]$/ {
+		sub(/^expires\.*: +/, "")
+		split($1, a, ".");
+		printf("%s-%02d-%02d", a[3], a[2], a[1]);
+		exit;
+	}
 
 	# .ua domain
 	# expires: 2017-09-01 17:09:32+03
