@@ -102,12 +102,26 @@ set_defaults() {
 	# Default values (days):
 	critical=7
 	warning=30
+	tldlist="/var/tmp/list_tld"
 
 	cache_age=0
 	cache_dir=
 
 	awk=${AWK:-awk}
 }
+
+#create a static list with all the valid domain names
+create_tldlist() {
+        if [ ! -f $tldlist ] || test "`find $tldlist -mtime +10`"
+        then
+               echo "tld file  $tldlist missing or older than 10 days, regenerating"
+                tldurl="https://publicsuffix.org/list/public_suffix_list.dat"
+                curl -s "$tldurl" \
+                | grep -v "^\s*$\|^\s*//" \
+                | sed -e 's/\./\\./g' -e 's/\*/.*/' -e 's/^\(.*\)$/[^.]\\+\\.\1$/' > $tldlist
+        fi
+}
+
 
 # Parse command line arguments
 parse_arguments() {
@@ -436,8 +450,19 @@ get_expiration() {
 	' "$outfile"
 }
 
+#Trim the user added subdomain part from a hostname
+trim_domain()
+{
+     local domain=$(echo -n $1 | grep -o -f "$tldlist" - \
+         | sort | uniq)
+     echo $domain
+}
+
 set_defaults
+create_tldlist
 parse_arguments "$@"
+
+domain=$(trim_domain $domain)
 
 if [ -n "$cache_dir" ]; then
 	# we might consider whois server name in cache file
