@@ -17,7 +17,7 @@
 set -e
 
 PROGRAM=${0##*/}
-VERSION=1.5.0
+VERSION=1.6.0
 
 STATE_OK=0
 STATE_WARNING=1
@@ -63,7 +63,7 @@ fullusage() {
 	cat <<EOF
 check_domain - v$VERSION
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com> (Original Author),
-Copyright (c) 2009-2016 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
+Copyright (c) 2009-2017 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
 Under GPL v2 License
 
 This plugin checks the expiration date of a domain name.
