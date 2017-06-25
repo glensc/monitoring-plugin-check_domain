@@ -25,7 +25,9 @@ STATE_CRITICAL=2
 STATE_UNKNOWN=3
 
 die() {
+	# shellcheck disable=SC2039
 	local rc="$1"
+	# shellcheck disable=SC2039
 	local msg="$2"
 	echo "$msg"
 
@@ -111,6 +113,7 @@ set_defaults() {
 
 # Parse command line arguments
 parse_arguments() {
+	# shellcheck disable=SC2039
 	local args
 	args=$(getopt -o hVd:w:c:P:s:a:C: --long help,version,domain:,warning:,critical:,path:,server:,cache-age:,cache-dir: -u -n "$PROGRAM" -- "$@")
 	eval set -- "$args"
@@ -175,15 +178,16 @@ parse_arguments() {
 	if [ -n "$cache_age" ] && ! is_numeric "$cache_age"; then
 		die "$STATE_UNKNOWN" "Cache age is not numeric: '$cache_age'"
 	fi
-	if [ -n "$cache_dir" ] && [ $cache_age -le 0 ]; then
+	if [ -n "$cache_dir" ] && [ "$cache_age" -le 0 ]; then
 		die "$STATE_UNKNOWN" "Cache dir set, but age not"
 	fi
 }
 
-# create tempfile. as secure as possible
+# create temporary file. as secure as possible
 # tempfile name is returned to stdout
-tempfile() {
-	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo ${TMPDIR:-/tmp}/check_domain.$RANDOM.$$
+temporary_file() {
+	# shellcheck disable=SC2039
+	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}/check_domain.$RANDOM.$$"
 }
 
 # Looking for whois binary
@@ -196,6 +200,7 @@ setup_whois() {
 		fi
 		[ -n "$whois" ] || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary, you specified an incorrect path"
 	else
+		# shellcheck disable=SC2039
 		type whois > /dev/null 2>&1 || die "$STATE_UNKNOWN" "UNKNOWN - Unable to find whois binary in your path. Is it installed? Please specify path."
 		whois=whois
 	fi
@@ -203,6 +208,7 @@ setup_whois() {
 
 # Run whois(1)
 run_whois() {
+	# shellcheck disable=SC2039
 	local error
 
 	setup_whois
@@ -210,7 +216,7 @@ run_whois() {
 	$whois ${server:+-h $server} "$domain" > "$outfile" 2>&1 && error=$? || error=$?
 	[ -s "$outfile" ] || die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist or no WHOIS server available."
 
-	if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" $outfile; then
+	if grep -q -e "No match for" -e "NOT FOUND" -e "NO DOMAIN" "$outfile"; then
 		die "$STATE_UNKNOWN" "UNKNOWN - Domain $domain doesn't exist."
 	fi
 
@@ -227,8 +233,10 @@ run_whois() {
 
 # Calculate days until expiration from whois output
 get_expiration() {
+	# shellcheck disable=SC2039
 	local outfile=$1
 
+	# shellcheck disable=SC2016
 	$awk '
 	BEGIN {
 		HH_MM_DD = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
@@ -444,15 +452,15 @@ if [ -n "$cache_dir" ]; then
 	outfile=$cache_dir/$domain
 
 	# clean up cache file if it's outdated
-	test -f "$outfile" && find "$outfile" -mtime +$cache_age -delete
+	test -f "$outfile" && find "$outfile" -mtime "+$cache_age" -delete
 
 	# run whois if cache is empty or missing
 	test -s "$outfile" || run_whois
 else
-	outfile=$(tempfile)
+	outfile=$(temporary_file)
 	run_whois
 fi
-expiration=$(get_expiration $outfile)
+expiration=$(get_expiration "$outfile")
 
 [ -z "$expiration" ] && die "$STATE_UNKNOWN" "UNKNOWN - Unable to figure out expiration date for $domain Domain."
 
