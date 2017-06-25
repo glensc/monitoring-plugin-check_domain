@@ -1,11 +1,22 @@
 language: bash
+addons:
+  apt:
+    sources:
+    - debian-sid    # Grab ShellCheck from the Debian repo
+    packages:
+#    - shellcheck
+    - whois
+    - gawk
+    - mawk
+    - original-awk
+    - mksh
+    - posh
+    - dash
+    - bash
 
 before_install:
   - sudo apt-get update
   - sudo apt-get install shellcheck
-  - sudo apt-get install whois
-  - sudo apt-get install gawk mawk original-awk
-  - sudo apt-get install mksh posh dash bash
 
 env:
   - AWK=awk
