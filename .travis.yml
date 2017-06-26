@@ -33,6 +33,7 @@ env:
 
 script:
   - shellcheck check_domain.sh
+  - shellcheck -s $SH check_domain.sh
   - ./test.sh
 
 # vim:ts=2:sw=2:et
