@@ -1,8 +1,28 @@
+language: bash
+dist: trusty
+addons:
+  apt:
+    packages:
+    - whois
+    - gawk
+    - mawk
+    - original-awk
+    - mksh
+    - posh
+    - dash
+    - bash
+
 before_install:
+  # Grab ShellCheck from the Debian repo
+  # install shellcheck after other packages already installed from Ubuntu repo
+  # https://github.com/koalaman/shellcheck/issues/941
+  - curl -sSL "https://ftp-master.debian.org/keys/archive-key-7.0.asc" | sudo -E apt-key add -
+  - echo "deb http://ftp.us.debian.org/debian unstable main contrib non-free" | sudo tee -a /etc/apt/sources.list > /dev/null
   - sudo apt-get update
-  - sudo apt-get install whois
-  - sudo apt-get install gawk mawk original-awk
-  - sudo apt-get install mksh posh dash bash
+  - sudo apt-get install shellcheck
+
+matrix:
+  fast_finish: true
 
 env:
   - AWK=awk
@@ -16,6 +36,9 @@ env:
   - SH=bash
 
 script:
+  - shellcheck check_domain.sh
+  # shell check knows only certain syntaxes
+  - 'case "$SH" in sh|bash|dash|ksh) shellcheck -s $SH check_domain.sh;; esac'
   - ./test.sh
 
 # vim:ts=2:sw=2:et
