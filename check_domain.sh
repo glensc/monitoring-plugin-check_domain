@@ -187,6 +187,7 @@ parse_arguments() {
 # tempfile name is returned to stdout
 temporary_file() {
 	# shellcheck disable=SC2039
+	# shellcheck disable=SC2169
 	mktemp --tmpdir -t check_domainXXXXXX 2>/dev/null || echo "${TMPDIR:-/tmp}/check_domain.$RANDOM.$$"
 }
 
