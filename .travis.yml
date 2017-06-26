@@ -1,4 +1,5 @@
 language: bash
+dist: trusty
 addons:
   apt:
     packages:
