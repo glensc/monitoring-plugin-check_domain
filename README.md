@@ -45,7 +45,7 @@ Debian/Ubuntu:
 
 RHEL/CentOS:
 ```
-# yum install jwhois
+# yum install whois
 ```
 
 
