@@ -302,6 +302,18 @@ get_expiration() {
 		}
 	}
 
+	# from a registration date, guess the next probable expiration date (cf. .lu domains)
+	function guess_expiration(month, day) {
+		this_year = strftime("%Y", systime());
+		exp_this_year = sprintf("%s%s%s", this_year, month, day);
+		now = strftime("%Y%m%d", systime());
+		if (exp_this_year > now) {
+			printf("%s-%s-%s", this_year, month, day); exit;
+		} else {
+			printf("%s-%s-%s", this_year + 1,  month, day); exit;
+		}
+	}
+
 	# Expiry date:  05-Dec-2014
 	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
 
@@ -442,6 +454,12 @@ get_expiration() {
 
 	# paid-till:     2017-12-10T12:42:36Z
 	/paid-till:/ && $NF ~ DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
+
+	# .lu domains (registered:	dd/mm/yyyy):
+	# .lu domains do not have an expiration property but from experience, they have to be renewed on a yearly basis.
+	# If domain X was registered on dd/mm/yyyy, we expect the upcoming expiry date to be on dd/mm the current or following year.
+	/registered:[ ]+/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($2, a, "/"); guess_expiration(a[2], a[1]); exit}
+
 	' "$outfile"
 }
 
