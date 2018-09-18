@@ -228,6 +228,9 @@ run_whois() {
 	if grep -q -e "fgets: Connection reset by peer" "$outfile"; then
 		error=0
 	fi
+	if grep -q -e "Registry Domain ID: .*VRSN" "$outfile"; then
+		error=0
+	fi
 
 	[ $error -eq 0 ] || die "$STATE_UNKNOWN" "UNKNOWN - WHOIS exited with error $error."
 }
