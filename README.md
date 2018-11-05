@@ -4,7 +4,7 @@ Nagios/Icinga Plugin: check\_domain
 [![Build Status](https://travis-ci.org/glensc/monitoring-plugin-check_domain.svg?branch=master)](https://travis-ci.org/glensc/monitoring-plugin-check_domain)
 
 ```
-Jason: 這是支援 .tw 域名檢測的修改版。
+Jason: 這是支援 .tw 域名檢測的分支修改版。
 ```
 
 Nagios/Icinga plugin for checking a domain name expiration date
