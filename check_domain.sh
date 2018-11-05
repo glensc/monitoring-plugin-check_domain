@@ -403,7 +403,7 @@ get_expiration() {
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
-	# Jason Add
+	# Jason add support .tw domain parse
 	# expires on 2023-04-15 (YYYY-MM-DD)
 	$0 ~ "expires on *" DATE_YYYY_MM_DD { print($4); exit}
 
