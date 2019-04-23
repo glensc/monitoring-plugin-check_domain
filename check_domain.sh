@@ -245,6 +245,7 @@ get_expiration() {
 		DD = "[0-9][0-9]"
 		MON = "[A-Za-z][a-z][a-z]"
 		DATE_DD_MM_YYYY_DOT = "[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9][0-9][0-9]"
+		DATE_Dn_Mn_YYYY_DOT = "[0-9][0-9]?\\.[0-9][0-9]?\\.[0-9][0-9][0-9][0-9]"
 		DATE_DD_MON_YYYY = "[0-9][0-9]-[A-Za-z][a-z][a-z]-[0-9][0-9][0-9][0-9]"
 		DATE_ISO_FULL = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T"
 		DATE_ISO_LIKE = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] "
@@ -257,6 +258,8 @@ get_expiration() {
 		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH " " HH_MM_DD
 		# 15.05.2016 13:36:48
 		DATE_DD_MM_YYYY_DOT_HH_MM_SS = DATE_DD_MM_YYYY_DOT " " HH_MM_DD
+		# 1.1.2016 13:36:48
+		DATE_Dn_Mn_YYYY_DOT_HH_MM_SS = DATE_Dn_Mn_YYYY_DOT " " HH_MM_DD
 
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
@@ -313,6 +316,9 @@ get_expiration() {
 
 	# Expiration date: 16.11.2013 15:30:13
 	/Expiration date:/ && $0 ~ DATE_DD_MM_YYYY_DOT_HH_MM_SS {split($(NF-1), a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
+	# expires......: 1.1.2013 15:30:13
+	/expires\.+:/ && $0 ~ DATE_Dn_Mn_YYYY_DOT_HH_MM_SS {split($(NF-1), a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
 	# Expire Date:  2015-10-22
 	# expire-date:	2016-02-05
