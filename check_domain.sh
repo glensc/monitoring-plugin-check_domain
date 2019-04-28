@@ -67,12 +67,9 @@ check_domain - v$VERSION
 Copyright (c) 2005 Tomàs Núñez Lirola <tnunez@criptos.com> (Original Author),
 Copyright (c) 2009-2017 Elan Ruusamäe <glen@pld-linux.org> (Current Maintainer)
 Under GPL v2 License
-
 This plugin checks the expiration date of a domain name.
-
 Usage: $PROGRAM -h | -d <domain> [-c <critical>] [-w <warning>] [-P <path_to_whois>] [-s <server>]
 NOTE: -d must be specified
-
 Options:
 -h, --help
      Print detailed help
@@ -92,11 +89,9 @@ Options:
      How many days should each WHOIS lookup be cached for (default 0). Requires cache dir.
 -C, --cache-dir
      Directory where to cache lookups
-
 This plugin will use whois service to get the expiration date for the domain name.
 Example:
      $PROGRAM -d domain.tld -w 30 -c 10
-
 EOF
 }
 
@@ -257,7 +252,6 @@ get_expiration() {
 		DATE_YYYY_MM_DD_DASH_HH_MM_SS = DATE_YYYY_MM_DD_DASH " " HH_MM_DD
 		# 15.05.2016 13:36:48
 		DATE_DD_MM_YYYY_DOT_HH_MM_SS = DATE_DD_MM_YYYY_DOT " " HH_MM_DD
-
 		# Wed Mar 02 23:59:59 GMT 2016
 		DATE_DAY_MON_DD_HHMMSS_TZ_YYYY = "[A-Z][a-z][a-z] [A-Z][a-z][a-z] [0-9][0-9] " HH_MM_DD " GMT " YYYY
 		# 25-Apr-2018 16:00:50
@@ -270,7 +264,6 @@ get_expiration() {
 		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
 		# 14 Jan 2016 22:40:29 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
-
 		# 2007-02-28 11:48:53+02
 		DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET = DATE_YYYY_MM_DD_DASH " " HH_MM_DD "\\+[0-9]+"
 		split("january february march april may june july august september october november december", months, " ");
@@ -281,17 +274,14 @@ get_expiration() {
 			Mon[mon] = i;
 		}
 	}
-
 	# convert short month name to month number (Month Of Year)
 	function mon2moy(month) {
 		return Mon[tolower(month)]
 	}
-
 	# convert long month name to month number (Month Of Year)
 	function month2moy(month) {
 		return Month[tolower(month)]
 	}
-
 	# get date from DATE_ISO_FULL format from `s` using field separator `fs` from index `i` and exit
 	function get_iso_date(s, fs, i,   a, d) {
 		if (split(s, a, fs)) {
@@ -301,70 +291,53 @@ get_expiration() {
 			}
 		}
 	}
-
 	# Expiry date:  05-Dec-2014
 	/Expir(y|ation) [Dd]ate:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
-
 	# expires:      05-Dec-2014
 	/expires:/ && $NF ~ DATE_DD_MON_YYYY {split($3, a, "-"); printf("%s-%s-%s\n", a[3], mon2moy(a[2]), a[1]); exit}
-
 	# Expiry Date: 19/11/2015
 	/Expiry Date:/ && $NF ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Expiration date: 16.11.2013 15:30:13
 	/Expiration date:/ && $0 ~ DATE_DD_MM_YYYY_DOT_HH_MM_SS {split($(NF-1), a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Expire Date:  2015-10-22
 	# expire-date:	2016-02-05
 	/[Ee]xpire[- ][Dd]ate:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
 	# expires: 20170716
 	/expires:/ && $NF ~ DATE_YYYY_MM_DD_NIL  {printf("%s-%s-%s", substr($2,0,4), substr($2,5,2), substr($2,7,2)); exit}
-
 	# expires:	2015-11-18
 	/expires:[ ]+/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
 	# renewal date: 2016.01.14 18:47:31
 	/renewal date:/ && $0 ~ DATE_YYYYMMDD_HHMMSS {split($(NF-1), a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# paid-till: 2013.11.01
 	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DOT {split($2, a, "."); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# paid-till: 2016-01-19
 	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
 	# expire: 16.11.2013
 	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# expire: 2016-01-19
 	/expire:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
+	# expire: 2016-01-19 00:00:00 (nic.ar)
+	/expire:/ && $NF ~ DATE_YYYY_MM_DD_DOT_HH_MM_SS {split($(NF-1), a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 	# Expiration Date: 2017-01-26T10:14:11Z
 	# Registrar Registration Expiration Date: 2015-02-22T00:00:00Z
 	# Registrar Registration Expiration Date: 2015-01-11T23:00:00-07:00Z
 	$0 ~ "Expiration Date: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
-
 	# domain_datebilleduntil: 2015-01-11T23:00:00-07:00Z
 	$0 ~ "billed[ ]*until: " DATE_ISO_FULL { get_iso_date($0, ":", 2) }
-
 	# Registrar Registration Expiration Date: 2018-09-21 00:00:00 -0400
 	$0 ~ "Expiration Date: " DATE_ISO_LIKE { get_iso_date($0, ":", 2) }
-
 	# Data de expiração / Expiration Date (dd/mm/yyyy): 18/01/2016
 	$0 ~ "Expiration Date .dd/mm/yyyy" {split($NF, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Domain Expiration Date: Wed Mar 02 23:59:59 GMT 2016
 	$0 ~ "Expiration Date: *" DATE_DAY_MON_DD_HHMMSS_TZ_YYYY {
 		printf("%s-%s-%s", $9, mon2moy($5), $6);
 	}
-
 	# Expiration Date:02-May-2018 16:12:25 UTC
 	$0 ~ "Expiration Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ {
 		sub(/^.*Expiration Date: */, "")
 		split($1, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
-
 	# .sg domains
 	# Expiration Date:		25-Apr-2018 16:00:50
 	# (uses tabs between colon and date, we match tabs or spaces regardless)
@@ -373,48 +346,35 @@ get_expiration() {
 		split($1, a, "-");
 		printf("%s-%s-%s", a[3], mon2moy(a[2]), a[1]);
 	}
-
 	# Expiry Date: 14 Jan 2016 22:40:29 UTC
 	$0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
 		printf("%s-%s-%s", $5, mon2moy($4), $3);
 	}
-
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
 	$0 ~ "Expiry Date: " DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
-
 	# Expiry date: 2017/07/16
 	/Expiry date:/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# Expiry Date: 19/11/2015 00:59:58
 	/Expiry Date:/ && $(NF-1) ~ DATE_DD_MM_YYYY_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Expires: 2014-01-31
 	# Expiry : 2014-03-08
 	# Valid-date 2014-10-21
 	/Valid-date|Expir(es|ation|y)/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
-
 	# [Expires on] 2014/12/01
 	/\[Expires on\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# [State] Connected (2014/12/01)
 	/\[State\]/ && $NF ~ DATE_YYYY_MM_DD_SLASH {gsub("[()]", "", $3); split($3, a, "/"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Renewal Date: 2016-06-25
 	$0 ~ "Renewal Date: *" DATE_YYYY_MM_DD { print($3); exit}
-
 	# Expiry Date: 31-03-2016
 	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
-
 	# Expired: 2015-10-03 13:36:48
 	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# Expiration Time: 2015-10-03 13:36:48
 	$0 ~ "Expiration Time: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($3, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
-
 	# .fi domains
 	# expires............: 4.7.2017 13:36:48
 	/^expires\.*: +[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9][0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]$/ {
@@ -423,23 +383,18 @@ get_expiration() {
 		printf("%s-%02d-%02d", a[3], a[2], a[1]);
 		exit;
 	}
-
 	# .ua domain
 	# expires: 2017-09-01 17:09:32+03
 	$0 ~ "expires: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 	# FIXME: XXX: weak patterns
-
 	# renewal: 31-March-2016
 	/renewal:/{split($2, a, "-"); printf("%s-%s-%s\n", a[3], month2moy(a[2]), a[1]); exit}
-
 	# expires: March 5 2014
 	/expires:/{printf("%s-%s-%s\n", $4, month2moy($2), $3); exit}
-
 	# Renewal date:
 	# Monday 21st Sep 2015
 	/Renewal date:/{renewal = 1; next}
 	{if (renewal) { sub(/[^0-9]+/, "", $2); printf("%s-%s-%s", $4, mon2moy($3), $2); exit}}
-
 	# paid-till:     2017-12-10T12:42:36Z
 	/paid-till:/ && $NF ~ DATE_ISO_FULL {split($0, a, ":"); s = a[2]; if (split(s,d,/T/)) print d[1]; exit}
 	' "$outfile"
