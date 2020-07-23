@@ -333,6 +333,9 @@ get_expiration() {
 	# paid-till: 2016-01-19
 	/paid-till:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
 
+	# Valid Until: 2016-01-19
+	/Valid Until:/ && $NF ~ DATE_YYYY_MM_DD_DASH {print $NF; exit}
+
 	# expire: 16.11.2013
 	/expire:/ && $NF ~ DATE_DD_MM_YYYY_DOT {split($2, a, "."); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
