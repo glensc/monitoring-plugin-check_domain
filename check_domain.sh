@@ -414,7 +414,9 @@ get_expiration() {
 
 	# .il domains
 	# validity:     05-11-2022
-	$0 ~ "validity: *" DATE_DD_MM_YYYY {split($2, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+	# .il domains registered at the dawn of Internet never expire...
+	# validity:     N/A
+	$0 ~ "validity: *" DATE_DD_MM_YYYY {if ($2 == "N/A") {print "2100-01-01"} else {split($2, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1])}; exit}
 
 	# Expired: 2015-10-03 13:36:48
 	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
