@@ -412,6 +412,10 @@ get_expiration() {
 	# Expiry Date: 31-03-2016
 	$0 ~ "Expiry Date: *" DATE_DD_MM_YYYY {split($3, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
 
+	# .il domains
+	# validity:     05-11-2022
+	$0 ~ "validity: *" DATE_DD_MM_YYYY {split($2, a, "-"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
 	# Expired: 2015-10-03 13:36:48
 	$0 ~ "Expired: *" DATE_YYYY_MM_DD_DASH_HH_MM_SS {split($2, a, "-"); printf("%s-%s-%s", a[1], a[2], a[3]); exit}
 
