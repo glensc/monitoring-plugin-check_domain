@@ -115,7 +115,7 @@ set_defaults() {
 parse_arguments() {
 	# shellcheck disable=SC2039
 	local args
-	args=$(getopt -o hVd:w:c:P:s:a:C: --long help,version,domain:,warning:,critical:,path:,server:,cache-age:,cache-dir: -u -n "$PROGRAM" -- "$@")
+	args=$(getopt -o hVd:w:c:P:s:a:C:H: --long help,version,domain:,warning:,critical:,path:,server:,cache-age:,cache-dir:,Host: -u -n "$PROGRAM" -- "$@")
 	eval set -- "$args"
 
 	while :; do
@@ -156,6 +156,9 @@ parse_arguments() {
 			fullusage
 			exit
 		;;
+                -H|--host)
+                        shift
+                ;;
 		--)
 			shift
 			break
@@ -405,6 +408,10 @@ get_expiration() {
 
 	# expires at: 21/05/2017 00:00:00 EEST
 	$0 ~ "expires at: *" DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ {split($3, a, "/"); printf("%s-%s-%s", a[3], a[2], a[1]); exit}
+
+	# Jason add support .tw domain parse
+	# expires on 2023-04-15 (YYYY-MM-DD)
+	$0 ~ "expires on *" DATE_YYYY_MM_DD { print($4); exit}
 
 	# Renewal Date: 2016-06-25
 	$0 ~ "Renewal Date: *" DATE_YYYY_MM_DD { print($3); exit}
