@@ -5,8 +5,6 @@ Nagios/Icinga Plugin: check\_domain
 
 Nagios/Icinga plugin for checking a domain name expiration date
 
-Felix: Add support myname.pchome.com.tw date foramt 2022/10/5
-
 ### Usage
 
 ```
