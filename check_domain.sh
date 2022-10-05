@@ -270,6 +270,8 @@ get_expiration() {
 		DATE_DD_MM_YYYY_SLASH_HHMMSS_TZ = DATE_DD_MM_YYYY_SLASH " " HH_MM_DD " [A-Z]+"
 		# 14 Jan 2016 22:40:29 UTC
 		DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE = "[0-9][0-9] " MON " " YYYY " " HH_MM_DD " UTC"
+                # myname.pchome.com.tw date format: 2023-06-03 00:00:00 (UTC+8)
+                DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZ_SPACE_OFFSET = DATE_YYYY_MM_DD_DASH " " HH_MM_DD " ""\\(UTC\\+[0-9]+\\)"
 
 		# 2007-02-28 11:48:53+02
 		DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZOFFSET = DATE_YYYY_MM_DD_DASH " " HH_MM_DD "\\+[0-9]+"
@@ -381,6 +383,13 @@ get_expiration() {
 	$0 ~ "Expiry Date: *" DATE_DD_MON_YYYY_HHMMSS_TZ_SPACE {
 		printf("%s-%s-%s", $5, mon2moy($4), $3);
 	}
+
+        # myname.pchome.com.tw
+        # Record expires on 2023-06-03 00:00:00 (UTC+8)
+        $0 ~ "Record expires on " DATE_YYYY_MM_DD_DASH_HH_MM_SS_TZ_SPACE_OFFSET {
+           split($0, a, " "); printf a[4];
+           exit;
+        }
 
 	# Registry Expiry Date: 2015-08-03T04:00:00Z
 	# Registry Expiry Date: 2017-01-26T10:14:11Z
